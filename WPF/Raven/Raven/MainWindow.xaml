@@ -7,9 +7,31 @@
         xmlns:local="clr-namespace:Raven"
         xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen">
+        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
     <Window.Resources>
+        <!-- TextBox Filters -->
+        <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Style.Resources>
+                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                    <VisualBrush.Visual>
+                        <Label Content="Search" Foreground="LightGray" />
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
         <!-- Map Styles -->
         <Style x:Key="MapForegroundStyle" TargetType="{x:Type overlays:MapForeground}">
             <Setter Property="Template">
@@ -96,16 +118,27 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
+        <!-- VIN / REG / Driver Filter -->
+        <TextBox Grid.Row="0" Grid.Column="0" Width="300" HorizontalAlignment="Left" Margin="10" FontSize="18"/>
         
-        
+        <!-- Date Start - Date End Filters -->
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="TileBtn" Click="TileBtn_OnClick" Content="Create Tile" Width="100" Height="24"/>
+            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"/>
+            <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2"/>
+            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"/>
+        </StackPanel>
+
         <!-- TripTile Section -->
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding TipTileCollection}" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10">
-            <ItemsPanelTemplate>
+        <ScrollViewer  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <ItemsControl x:Name="Dong" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10">
+            <!--<ItemsPanelTemplate>
                 <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
-            </ItemsPanelTemplate>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border CornerRadius="9" BorderBrush="DimGray" BorderThickness="3"  Width="256" Height="156">
+            </ItemsPanelTemplate>-->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Border CornerRadius="9" BorderBrush="DimGray" BorderThickness="3" Margin="10" Width="256" Height="156">
                         <Border.Effect>
                             <DropShadowEffect Opacity="0.5" Color="Gray"/>
                         </Border.Effect>
@@ -159,9 +192,11 @@
                             </Grid>
                         </Border>
                     </Border>
-                </DataTemplate>
+                        </WrapPanel>
+                    </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+            </ItemsControl>
+        </ScrollViewer>
 
     </Grid>
 </Window>

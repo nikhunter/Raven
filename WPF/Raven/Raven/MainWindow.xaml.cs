@@ -24,22 +24,20 @@ namespace Raven {
         public static ObservableCollection<string> TripTileCollection { get; set; } = new ObservableCollection<string>(); // Collection of Map  pins, uses custom Datapoint class as type
         public static ObservableCollection<Datapoint> PushPinCollection { get; set; } = new ObservableCollection<Datapoint>(); // Collection of Map  pins, uses custom Datapoint class as type
 
-
-        public MainWindow()
-        {
+        public MainWindow() {
             InitializeComponent();
 
-            TripTileCollection.Add("One");
-            TripTileCollection.Add("Two");
-            TripTileCollection.Add("Three");
-            TripTileCollection.Add("Four");
-            TripTileCollection.Add("Five");
+            var binding = new Binding();
+            binding.Source = TripTileCollection;
+            Dong.SetBinding(ItemsControl.ItemsSourceProperty, binding);
 
-            TripTileCollection.Add("Six");
-            TripTileCollection.Add("Seven");
-            TripTileCollection.Add("Eight");
-            TripTileCollection.Add("Nine");
-            TripTileCollection.Add("Ten");
+
+            TripTileCollection.Add("One");
+            TripTileCollection.Add("One");
+        }
+
+        private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
+            TripTileCollection.Add("One");
         }
     }
 }
