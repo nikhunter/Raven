@@ -6,6 +6,7 @@
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:local="clr-namespace:Raven"
         xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
+        xmlns:controls="clr-namespace:Raven.Controls"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
@@ -31,7 +32,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <!-- Map Styles -->
         <Style x:Key="MapForegroundStyle" TargetType="{x:Type overlays:MapForeground}">
             <Setter Property="Template">
@@ -42,7 +43,7 @@
                                    FontSize="7"
                                    VerticalAlignment="Bottom"
                                    HorizontalAlignment="Right"
-                                   Margin="0,0,1,1"/>
+                                   Margin="0,0,1,1" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -56,38 +57,49 @@
                                 <ContentPresenter.Content>
                                     <Grid Margin="5">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                            <TextBlock Text="{Binding Date}" Foreground="White" FontWeight="Bold" FontSize="16"/>
-                                            <TextBlock Text=" - " Foreground="White" FontWeight="Bold" FontSize="16"/>
-                                            <TextBlock Text="{Binding Time}" Foreground="White" FontWeight="Bold" FontSize="16"/>
+                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0"
+                                                    Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                            <TextBlock Text="{Binding Date}" Foreground="White" FontWeight="Bold"
+                                                       FontSize="16" />
+                                            <TextBlock Text=" - " Foreground="White" FontWeight="Bold" FontSize="16" />
+                                            <TextBlock Text="{Binding Time}" Foreground="White" FontWeight="Bold"
+                                                       FontSize="16" />
                                         </StackPanel>
 
-                                        <TextBlock Text="Speed:&#x09;" Grid.Row="1" Grid.Column="0" Foreground="White" HorizontalAlignment="Left"/>
-                                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Speed}" Foreground="White"/>
-                                            <TextBlock Text=" Km/t" Foreground="White"/>
+                                        <TextBlock Text="Speed:&#x09;" Grid.Row="1" Grid.Column="0" Foreground="White"
+                                                   HorizontalAlignment="Left" />
+                                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1"
+                                                    HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding Speed}" Foreground="White" />
+                                            <TextBlock Text=" Km/t" Foreground="White" />
                                         </StackPanel>
 
-                                        <TextBlock Text="RPM:&#x09;" Grid.Row="2" Grid.Column="0" Foreground="White" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{Binding Rpm}" Grid.Row="2" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBlock Text="RPM:&#x09;" Grid.Row="2" Grid.Column="0" Foreground="White"
+                                                   HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Rpm}" Grid.Row="2" Grid.Column="1" Foreground="White"
+                                                   HorizontalAlignment="Left" />
 
-                                        <TextBlock Text="Latitude:&#x09;" Grid.Row="3" Grid.Column="0" Foreground="White" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{Binding Location.Latitude}" Grid.Row="3" Grid.Column="1" Foreground="White"/>
+                                        <TextBlock Text="Latitude:&#x09;" Grid.Row="3" Grid.Column="0"
+                                                   Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Location.Latitude}" Grid.Row="3" Grid.Column="1"
+                                                   Foreground="White" />
 
-                                        <TextBlock Text="Longitude:&#x09;" Grid.Row="4" Grid.Column="0" Foreground="White" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{Binding Location.Longitude}" Grid.Row="4" Grid.Column="1" Foreground="White"/>
+                                        <TextBlock Text="Longitude:&#x09;" Grid.Row="4" Grid.Column="0"
+                                                   Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Location.Longitude}" Grid.Row="4" Grid.Column="1"
+                                                   Foreground="White" />
                                     </Grid>
                                 </ContentPresenter.Content>
                             </ContentPresenter>
@@ -110,91 +122,94 @@
 
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <!-- VIN / REG / Driver Filter -->
-        <TextBox Grid.Row="0" Grid.Column="0" Width="300" HorizontalAlignment="Left" Margin="10" FontSize="18"/>
-        
+        <TextBox Grid.Row="0" Grid.Column="0" Width="300" HorizontalAlignment="Left" Margin="10" FontSize="18" />
+
         <!-- Date Start - Date End Filters -->
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="TileBtn" Click="TileBtn_OnClick" Content="Create Tile" Width="100" Height="24"/>
-            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"/>
-            <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2"/>
-            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"/>
+            <Button x:Name="TileBtn" Click="TileBtn_OnClick" Content="Create Tile" Width="100" Height="24" />
+            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" />
+            <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2" />
+            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" />
         </StackPanel>
 
         <!-- TripTile Section -->
-        <ScrollViewer  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <ItemsControl x:Name="Dong" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10">
-            <!--<ItemsPanelTemplate>
-                <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
-            </ItemsPanelTemplate>-->
+        <ScrollViewer x:Name="TileScrollView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <ItemsControl x:Name="Dong" ItemsSource="{Binding TripTileCollection}" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <WrapPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Border CornerRadius="9" BorderBrush="DimGray" BorderThickness="3" Margin="10" Width="256" Height="156">
-                        <Border.Effect>
-                            <DropShadowEffect Opacity="0.5" Color="Gray"/>
-                        </Border.Effect>
-                        <Border CornerRadius="9">
-                            <Border.Clip>
-                                <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,251,151"/>
-                            </Border.Clip>
-                            <Grid x:Name="TileGrid" Width="250" Height="150" Background="White">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                        <Border CornerRadius="9" BorderBrush="Gray" BorderThickness="3" Margin="10" Width="256"
+                                    Height="156" Cursor="Hand">
+                            <!--<Border.Effect>
+                                <DropShadowEffect Opacity="0.5"/>
+                            </Border.Effect>-->
+                            <Border CornerRadius="9">
+                                <Border.Clip>
+                                    <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,251,151" />
+                                </Border.Clip>
+                                <Grid x:Name="TileGrid" Width="250" Height="150" Background="White" HorizontalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- VIN and distance -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="WF0DXXGAKDGL55839" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="0,0,3,0">
-                                        <Run Text="17.2"/>
-                                        <Run Text="km"/>
-                                </TextBlock>
+                                    <!--VIN and distance-->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="WF0DXXGAKDGL55839"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                   Margin="3,0,0,0" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom" Margin="0,0,3,0">
+                                            <Run Text="17.2" />
+                                            <Run Text="km" />
+                                    </TextBlock>
 
-                                <!-- Date, time and duration -->
-                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        <Run Text="17/05/2017"/>
-                                        <Run Text="-"/>
-                                        <Run Text="14:30"/>
-                                </TextBlock>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,3,0" HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <Run Text="20"/>
-                                        <Run Text="min"/>
-                                </TextBlock>
+                                    <!--Date, time and duration-->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="3,0,0,0"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Top">
+                                            <Run Text="17/05/2017" />
+                                            <Run Text="-" />
+                                            <Run Text="14:30" />
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,3,0"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Top">
+                                            <Run Text="20" />
+                                            <Run Text="min" />
+                                    </TextBlock>
 
-                                <!-- Map -->
-                                <m:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road" Center="55.729205, 12.408742" ZoomLevel="11" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="Auto" Width="Auto" MapForegroundStyle="{StaticResource MapForegroundStyle}" CredentialsProvider="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm">
-                                    <m:MapItemsControl ItemsSource="{Binding PushPinCollection}">
-                                        <m:MapItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <m:Pushpin Location="{Binding Location}" Cursor="Hand">
-                                                    <ToolTipService.ToolTip>
-                                                        <ToolTip Style="{StaticResource PushPinToolTipStyle}"/>
-                                                    </ToolTipService.ToolTip>
-                                                </m:Pushpin>
-                                            </DataTemplate>
-                                        </m:MapItemsControl.ItemTemplate>
-                                    </m:MapItemsControl>
-                                </m:Map>
-                            </Grid>
+                                    <!--Map-->
+                                    <controls:TileMap Grid.Row="2"
+                                                      Grid.Column="0" Grid.ColumnSpan="2"/>
+                                    <!--<m:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road"
+                                               Center="{Binding Center}" ZoomLevel="{Binding ZoomLevel}" Grid.Row="2"
+                                               Grid.Column="0" Grid.ColumnSpan="2" Height="Auto" Width="Auto"
+                                               MapForegroundStyle="{StaticResource MapForegroundStyle}"
+                                               CredentialsProvider="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm">
+                                        <m:Pushpin Location="{Binding StartLocation}"/>
+                                        <m:Pushpin Location="{Binding EndLocation}"/>
+                                    </m:Map>-->
+                                </Grid>
+                            </Border>
                         </Border>
-                    </Border>
-                        </WrapPanel>
                     </DataTemplate>
-            </ItemsControl.ItemTemplate>
+                </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
 
