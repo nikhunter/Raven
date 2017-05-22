@@ -11,7 +11,7 @@ namespace Raven
     {
         public Location StartLocation { get; set; }
         public Location EndLocation { get; set; }
-        public Location Center { get; set; }
+        public Location CenterLocation { get; set; }
         public int ZoomLevel { get; set; }
         public MapLayer Route { get; set; }
         public string Title { get; set; }
@@ -23,7 +23,7 @@ namespace Raven
         public Tile(Location startLocation, Location endLocation, Location center, int zoomLevel, MapLayer route, string title, string date, string timeStarted, double distance, int duration) {
             StartLocation = startLocation;
             EndLocation = endLocation;
-            Center = center;
+            CenterLocation = center;
             ZoomLevel = zoomLevel;
             Route = route;
             Title = title;

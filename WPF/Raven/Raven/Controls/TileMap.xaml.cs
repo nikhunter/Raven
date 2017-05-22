@@ -22,14 +22,13 @@ namespace Raven.Controls {
     public partial class TileMap : UserControl {
         public TileMap() {
             ObservableCollection<Tile> pins = MainWindow.TripTileCollection;
-            int count = pins.Count - 1;
-
             InitializeComponent();
-            TripTileMap.Center = pins[count].Center;
-            TripTileMap.ZoomLevel = pins[count].ZoomLevel;
 
-            Pushpin startLocation = new Pushpin {Location = pins[count].StartLocation};
-            Pushpin endLocation = new Pushpin {Location = pins[count].EndLocation};
+            TripTileMap.Center = pins[pins.Count-1].CenterLocation;
+            TripTileMap.ZoomLevel = pins[pins.Count - 1].ZoomLevel;
+
+            Pushpin startLocation = new Pushpin { Location = pins[pins.Count - 1].StartLocation };
+            Pushpin endLocation = new Pushpin { Location = pins[pins.Count - 1].EndLocation };
 
             TripTileMap.Children.Add(startLocation);
             TripTileMap.Children.Add(endLocation);
