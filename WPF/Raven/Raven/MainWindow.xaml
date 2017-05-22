@@ -195,8 +195,7 @@
                                     </TextBlock>
 
                                     <!--Map-->
-                                    <controls:TileMap Grid.Row="2"
-                                                      Grid.Column="0" Grid.ColumnSpan="2"/>
+                                    <controls:TileMap Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
                                     <!--<m:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road"
                                                Center="{Binding Center}" ZoomLevel="{Binding ZoomLevel}" Grid.Row="2"
                                                Grid.Column="0" Grid.ColumnSpan="2" Height="Auto" Width="Auto"

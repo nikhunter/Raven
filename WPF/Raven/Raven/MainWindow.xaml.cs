@@ -26,6 +26,9 @@ namespace Raven {
         public MainWindow() {
             InitializeComponent();
 
+            TripTileCollection.Add(new Tile(new Location(55.758019, 12.392440), new Location(55.759491, 12.457088), new Location(55.759254, 12.422076), 11, null, "BE70846", "19/05/2017", "13:30", 17.2, 20));
+            TripTileCollection.Add(new Tile(new Location(55.758119, 12.392140), new Location(55.759191, 12.457188), new Location(55.759154, 12.422176), 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
+
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
 
@@ -36,6 +39,7 @@ namespace Raven {
 
         private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
             TripTileCollection.Add(new Tile(new Location(55.758019, 12.392440), new Location(55.759491, 12.457088), new Location(55.759254, 12.422076), 11, null, "BE70846", "19/05/2017", "13:30", 17.2, 20));
+            TripTileCollection.Add(new Tile(new Location(55.758119, 12.392140), new Location(55.759191, 12.457188), new Location(55.759154, 12.422176), 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
         }
     }
 }

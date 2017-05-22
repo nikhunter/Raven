@@ -15,21 +15,24 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Maps.MapControl.WPF;
 
-namespace Raven.Controls
-{
+namespace Raven.Controls {
     /// <summary>
     /// Interaction logic for TileMap.xaml
     /// </summary>
-    public partial class TileMap : UserControl
-    {
-        public static ObservableCollection<Tile> TripTileCollection { get; set; } = new ObservableCollection<Tile>(); // Collection of Map  pins, uses custom Datapoint class as type
+    public partial class TileMap : UserControl {
+        public TileMap() {
+            ObservableCollection<Tile> pins = MainWindow.TripTileCollection;
+            int count = pins.Count - 1;
 
-        public TileMap()
-        {
             InitializeComponent();
-            TripTileCollection.Add(new Tile(new Location(55.758019, 12.392440), new Location(55.759491, 12.457088), new Location(55.759254, 12.422076), 11, null, "BE70846", "19/05/2017", "13:30", 17.2, 20));
-            TripTileCollection.Add(new Tile(new Location(55.758019, 12.392440), new Location(55.759491, 12.457088), new Location(55.759254, 12.422076), 11, null, "BE70846", "19/05/2017", "13:30", 17.2, 20));
-            TripTileCollection.Add(new Tile(new Location(55.758019, 12.392440), new Location(55.759491, 12.457088), new Location(55.759254, 12.422076), 11, null, "BE70846", "19/05/2017", "13:30", 17.2, 20));
+            TripTileMap.Center = pins[count].Center;
+            TripTileMap.ZoomLevel = pins[count].ZoomLevel;
+
+            Pushpin startLocation = new Pushpin {Location = pins[count].StartLocation};
+            Pushpin endLocation = new Pushpin {Location = pins[count].EndLocation};
+
+            TripTileMap.Children.Add(startLocation);
+            TripTileMap.Children.Add(endLocation);
         }
     }
 }

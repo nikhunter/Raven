@@ -29,12 +29,9 @@
 
     <Grid>
         <!--Map-->
-        <wpf:Map x:Name="TripTileMap" IsEnabled="True" Mode="Road"
-                 Center="{Binding Center}" ZoomLevel="{Binding ZoomLevel}" Height="Auto" Width="Auto"
+        <wpf:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road" ZoomLevel="0" Height="Auto" Width="Auto"
                  MapForegroundStyle="{StaticResource MapForegroundStyle}"
                  CredentialsProvider="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm">
-            <wpf:Pushpin Location="{Binding StartLocation}" />
-            <wpf:Pushpin Location="{Binding EndLocation}" />
         </wpf:Map>
     </Grid>
 </UserControl>
