@@ -127,10 +127,11 @@ public class MainActivity extends Activity
 
     void openBT() throws IOException
     {
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+
+        //DONT CHANGE, THIS DEFINES THE BLUETOOTH SERIAL PROTOCOL
+        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
         mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-        //mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-       // mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
         WriteLog("Initializing Socket... Please wait");
         mmSocket.connect();
 
@@ -177,11 +178,14 @@ public class MainActivity extends Activity
                                     System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
                                     final String data = new String(encodedBytes, "US-ASCII");
                                     readBufferPosition = 0;
-
-
+                                    handler.post(new Runnable()
+                                    {
+                                        public void run()
+                                        {
+                                            WriteLog(data);
+                                        }
+                                    });
                                 }
-
-
                                 else
                                 {
                                     readBuffer[readBufferPosition++] = b;

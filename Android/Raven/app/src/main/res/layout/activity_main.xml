@@ -52,5 +52,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/open"
         android:ems="10"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:verticalScrollbarPosition="right" />
+
 </RelativeLayout>
