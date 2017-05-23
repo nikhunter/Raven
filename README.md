@@ -1,4 +1,5 @@
-![logo](http://raven-gps.com/logos/512.png)
+![logo](http://raven-gps.com/logos/128.png)
+
 Raven
 =====
 
