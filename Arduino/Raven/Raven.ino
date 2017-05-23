@@ -23,8 +23,9 @@ void setup() {
 
   // initialize OBD-II adapter
   while(!obd.init()) {
-    lcd.println("Init...");
-  } while (!obd.init());
+    lcd.setCursor(0,0);
+    lcd.println("Standby for OBD Connection");
+  }
 
   char buf[64];
   if (obd.getVIN(buf, sizeof(buf))) {

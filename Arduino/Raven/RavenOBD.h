@@ -28,6 +28,8 @@ void testOut()
         delay(1000);
     }
     lcd.println();
+    delay(5000);
+    lcd.clear();
 }
 
 void readMEMS()
