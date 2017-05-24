@@ -16,8 +16,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Device.Location;
+using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Raven.Controls;
+using Raven.Windows;
 
 namespace Raven {
     /// <summary>
@@ -27,33 +29,79 @@ namespace Raven {
         public static ObservableCollection<Tile> TripTileCollection { get; set; } =
             new ObservableCollection<Tile>(); // Collection of Map  pins, uses custom Datapoint class as type
 
+        private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
+
         private Location start = new Location(55.758019, 12.392440);
         private Location end = new Location(55.759491, 12.457088);
         private Location center;
 
         public MainWindow() {
+            // Initiate LoginWindow element
+            var loginWindow = new LoginWindow();
+            Hide();
+            loginWindow.Show();
             InitializeComponent();
+
+            loginWindow.Closed += delegate {
+                if (loginWindow.LoginSuccess)
+                {
+                    Show();
+                }
+                else
+                {
+                    Close();
+                }
+            };
 
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
+        }
 
-            //var binding = new Binding();
-            //binding.Source = TripTileCollection;
-            //Dong.SetBinding(ItemsControl.ItemsSourceProperty, binding);
+        // TODO SELECT * FROM trips, and create TripTiles based on results
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
+            DataTable dt = new DataTable();
+            connection.Open();
+
+            try {
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = $"SELECT * FROM trips";
+
+                using (MySqlDataReader dr = command.ExecuteReader()) {
+                    dt.Load(dr);
+                    foreach (DataRow row in dt.Rows) {
+                        string rowValue = row["log_file"].ToString();
+
+                        MessageBox.Show(rowValue);
+                    }
+                }
+            }
+            catch (MySqlException exception) {
+                MessageBox.Show(exception.ToString());
+            }
+        }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e) {
         }
 
         public void SqlGetByReg(string reg) {
+            MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
-            const string connectionString = @"Data Source=raven-gps.com; Initial Catalog=raven; User Id = root; Password = Raven123";
+            connection.Open();
 
-            using (var con =
-                new SqlConnection(connectionString)) {
-                using (var command = new SqlCommand("SELECT * FROM trips WHERE driver_reg=" + reg)) {
-                    con.Open();
-                    using (SqlDataReader dr = command.ExecuteReader()) {
-                        dt.Load(dr);
+            try {
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = $"SELECT * FROM trips WHERE driver_reg='{reg}'";
+
+                using (MySqlDataReader dr = command.ExecuteReader()) {
+                    dt.Load(dr);
+                    foreach (var line in dt.Rows[0].ItemArray) {
+                        MessageBox.Show(line.ToString());
                     }
                 }
+            }
+            catch (MySqlException exception) {
+                MessageBox.Show(exception.ToString());
             }
         }
 

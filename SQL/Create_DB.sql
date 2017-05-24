@@ -64,5 +64,5 @@ insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_u
     "NWMicheelsen"
 );
 
-select * from logins;
+SELECT * FROM logins;
 SELECT * FROM trips
