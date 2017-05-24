@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +40,21 @@ namespace Raven {
             //var binding = new Binding();
             //binding.Source = TripTileCollection;
             //Dong.SetBinding(ItemsControl.ItemsSourceProperty, binding);
+        }
+
+        public void SqlGetByReg(string reg) {
+            DataTable dt = new DataTable();
+            const string connectionString = @"Data Source=raven-gps.com; Initial Catalog=raven; User Id = root; Password = Raven123";
+
+            using (var con =
+                new SqlConnection(connectionString)) {
+                using (var command = new SqlCommand("SELECT * FROM trips WHERE driver_reg=" + reg)) {
+                    con.Open();
+                    using (SqlDataReader dr = command.ExecuteReader()) {
+                        dt.Load(dr);
+                    }
+                }
+            }
         }
 
         // Returns the distance (in metric meters) between two locations
@@ -90,9 +107,14 @@ namespace Raven {
         }
 
         private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
-            center = MidPoint(new GeoCoordinate(start.Latitude, start.Longitude), new GeoCoordinate(end.Latitude, end.Longitude));
+            center = MidPoint(new GeoCoordinate(start.Latitude, start.Longitude),
+                new GeoCoordinate(end.Latitude, end.Longitude));
             TripTileCollection.Add(new Tile(start, end, center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
             ChangeLocations();
+        }
+
+        private void SearchBtn_OnClick(object sender, RoutedEventArgs e) {
+            SqlGetByReg("BE70846");
         }
     }
 }

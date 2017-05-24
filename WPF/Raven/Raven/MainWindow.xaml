@@ -135,6 +135,7 @@
 
         <!-- Date Start - Date End Filters -->
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
             <Button x:Name="TileBtn" Click="TileBtn_OnClick" Content="Create Tile" Width="100" Height="24" />
             <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" />
             <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2" />
