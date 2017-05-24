@@ -1,4 +1,5 @@
 bool hasMEMS;
+int deltatime = 0;
 
 void testOut()
 {
@@ -66,22 +67,42 @@ void readMEMS()
 void readPIDs()
 {
     static const byte pidlist[] = {PID_ENGINE_LOAD, PID_COOLANT_TEMP, PID_RPM, PID_SPEED, PID_TIMING_ADVANCE, PID_INTAKE_TEMP, PID_THROTTLE, PID_FUEL_LEVEL};
-    BT.print('[');
-    BT.print(millis());
-    BT.print(']');
-    for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
-        byte pid = pidlist[i];
-        bool valid = obd.isValidPID(pid);
-        BT.print((int)pid | 0x100, HEX);
-        BT.print('=');
-        if (valid) {
-            int value;
-            if (obd.readPID(pid, value)) {
-              BT.print(value);
-            }
-        }
-        BT.print(' ');
-     }
-     BT.println();
+
+      BT.print('{');
+      
+      BT.print("\"TimeDelta\": ");
+      
+      BT.print('"');
+      BT.print(millis());
+      BT.print('"');
+      
+      BT.print(", ");
+      
+      for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
+          byte pid = pidlist[i];
+          bool valid = obd.isValidPID(pid);
+          BT.print('"');
+          BT.print((int)pid | 0x100, HEX);
+          BT.print("\": ");
+          if (valid) {
+              int value;
+              if (obd.readPID(pid, value)) {
+                BT.print('"'+value+'"');
+              }
+          }
+          else{
+            BT.print("\"\"");
+          }
+          
+          if((i + 1) < sizeof(pidlist) / sizeof(pidlist[0])){
+            BT.print(", ");
+          }
+       }
+       BT.print('}');
+       BT.println();
+       deltatime = millis();
+       delay(1000);
+     
+     
 }
 
