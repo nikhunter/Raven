@@ -9,20 +9,19 @@ CREATE TABLE IF NOT EXISTS `raven`.`logins` (
   `username` VARCHAR(32) NOT NULL,
   `password` mediumtext NOT NULL,
   PRIMARY KEY (`id`, `username`),
-  UNIQUE INDEX `reg_UNIQUE` (`reg` ASC),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC))
 COMMENT = 'Login table for Raven-GPS authentication';
 
 insert into logins (`reg`,`username`,`password`) values (
     "BK79499",
     "RWejlgaard",
-    "9151440965cf9c5e07f81eee6241c042a7b78e9bb2dd4f928a8f6da5e369cdffdd2b70c70663ee30d02115731d35f1ece5aad9b362aaa9850efa99e3d197212a  -"
+    "E6C83B282AEB2E022844595721CC00BBDA47CB24537C1779F9BB84F04039E1676E6BA8573E588DA1052510E3AA0A32A9E55879AE22B0C2D62136FC0A3E85F8BB"
 );
 
 insert into logins (`reg`,`username`,`password`) values (
     "BE70846",
     "NWMicheelsen",
-    "9151440965cf9c5e07f81eee6241c042a7b78e9bb2dd4f928a8f6da5e369cdffdd2b70c70663ee30d02115731d35f1ece5aad9b362aaa9850efa99e3d197212a  -"
+    "E6C83B282AEB2E022844595721CC00BBDA47CB24537C1779F9BB84F04039E1676E6BA8573E588DA1052510E3AA0A32A9E55879AE22B0C2D62136FC0A3E85F8BB"
 );
 
 CREATE TABLE `raven`.`trips` (
@@ -36,11 +35,6 @@ CREATE TABLE `raven`.`trips` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `reg_idx` (`driver_reg` ASC),
   INDEX `driver_username_idx` (`driver_username` ASC),
-  CONSTRAINT `driver_reg_FK`
-    FOREIGN KEY (`driver_reg`)
-    REFERENCES `raven`.`logins` (`reg`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT `driver_username_FK`
     FOREIGN KEY (`driver_username`)
     REFERENCES `raven`.`logins` (`username`)
