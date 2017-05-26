@@ -5,3 +5,4 @@
 
 LCD_R61581 lcd;
 COBDI2C obd;
+TinyGPS gps;

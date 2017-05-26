@@ -53,17 +53,13 @@ void setup() {
   lcd.print("STATUS: ");
   lcd.setColor(RGB16_GREEN);
   lcd.println("ACTIVE");
-  lcd.setFontSize(FONT_SIZE_SMALL);
+  lcd.println();
   lcd.setColor(RGB16_WHITE);
   delay(3000);
 }
 
 void loop() {
   readPIDs();
-
-  if (GPS.available()){
-    BT.println(GPS.read());  
-  }
   
   /* if (hasMEMS) {
     readMEMS();
