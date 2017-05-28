@@ -3,6 +3,7 @@
 #include <MultiLCD.h>
 #include <TinyGPS.h>
 #include <SD.h>
+#include <ArduinoJson.h>
 #include "Raven.h"
 #include "RavenOBD.h"
 
@@ -59,8 +60,8 @@ void setup() {
 }
 
 void loop() {
-  readPIDs();
-  
+  //readPIDs();
+  processGPS();
   /* if (hasMEMS) {
     readMEMS();
   }*/
