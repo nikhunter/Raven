@@ -53,7 +53,7 @@ namespace Raven.Windows {
 
         private void AttemptLogin() {
             // If login is corrrect changes LoginSuccess to true and closes LoginWindow
-            if (AuthenticateLogin(UsernameText.Text, PasswordText.Password)) {
+            if (AuthenticateLogin(UsernameText.Text.ToLower(), PasswordText.Password)) {
                 LoginSuccess = true;
                 Close();
             }
@@ -82,13 +82,13 @@ namespace Raven.Windows {
                     if (dt.Rows.Cast<DataRow>().Where(variable => variable.Field<string>("username") == username).Any(variable => variable.Field<string>("password") == hash)) {
                         return true;
                     }
-                    return false;
                 }
             }
             catch (MySqlException exception) {
                 MessageBox.Show(exception.ToString());
                 return false;
             }
+            return false;
         }
 
         public static string GetHash(string inputString) {
@@ -106,12 +106,24 @@ namespace Raven.Windows {
             return result.ToString();
         }
 
+        private void UsernameText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(UsernameText.Text)) {
+                UsernameText.Text = null;
+            }
+        }
+
         private void PasswordText_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
-            PasswordText.Password = null;
+            if (PasswordText.Password == "PPPPPPPP") {
+                PasswordText.Password = null;
+            }
         }
 
         private void PasswordText_LostGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
-            PasswordText.Password = "Password";
+            if (PasswordText.Password == "")
+            {
+                PasswordText.Password = "PPPPPPPP";
+            }
         }
 
         private void LoginWindow_OnKeyDown(object sender, KeyEventArgs e) {
@@ -121,7 +133,9 @@ namespace Raven.Windows {
                         LoginSuccess = true;
                         Close();
                     }
-                    AttemptLogin();
+                    else {
+                        AttemptLogin();
+                    }
                     break;
             }
         }

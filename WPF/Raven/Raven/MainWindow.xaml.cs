@@ -1,39 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Device.Location;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
-using Raven.Controls;
 using Raven.Windows;
 
 namespace Raven {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow {
         public static ObservableCollection<Tile> TripTileCollection { get; set; } =
             new ObservableCollection<Tile>(); // Collection of Map  pins, uses custom Datapoint class as type
 
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
 
-        private Location start = new Location(55.758019, 12.392440);
-        private Location end = new Location(55.759491, 12.457088);
-        private Location center;
+        private readonly Location _start = new Location(55.758019, 12.392440);
+        private readonly Location _end = new Location(55.759491, 12.457088);
+        private Location _center;
 
         public MainWindow() {
             // Initiate LoginWindow element
@@ -72,7 +59,7 @@ namespace Raven {
                     foreach (DataRow row in dt.Rows) {
                         string rowValue = row["log_file"].ToString();
 
-                        MessageBox.Show(rowValue);
+                        //MessageBox.Show(rowValue);
                     }
                 }
             }
@@ -123,18 +110,18 @@ namespace Raven {
             GeoCoordinate midPoint = new GeoCoordinate();
 
             double dLon = DegreeToRadian(posB.Longitude - posA.Longitude);
-            double Bx = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Cos(dLon);
-            double By = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Sin(dLon);
+            double bx = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Cos(dLon);
+            double by = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Sin(dLon);
 
             midPoint.Latitude = RadianToDegree(Math.Atan2(
                 Math.Sin(DegreeToRadian(posA.Latitude)) + Math.Sin(DegreeToRadian(posB.Latitude)),
                 Math.Sqrt(
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + Bx) *
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + Bx) + By * By)));
+                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) *
+                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) + by * by)));
             // (Math.Cos(DegreesToRadians(posA.Latitude))) + Bx) + By * By)); // Your Code
 
             midPoint.Longitude = posA.Longitude +
-                                 RadianToDegree(Math.Atan2(By, Math.Cos(DegreeToRadian(posA.Latitude)) + Bx));
+                                 RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
 
             return new Location(midPoint.Latitude, midPoint.Longitude);
         }
@@ -148,16 +135,16 @@ namespace Raven {
         }
 
         private void ChangeLocations() {
-            start.Latitude = start.Latitude + 0.01;
-            start.Longitude = start.Longitude + 0.01;
-            end.Latitude = start.Latitude + 0.01;
-            end.Longitude = start.Longitude + 0.01;
+            _start.Latitude = _start.Latitude + 0.01;
+            _start.Longitude = _start.Longitude + 0.01;
+            _end.Latitude = _start.Latitude + 0.01;
+            _end.Longitude = _start.Longitude + 0.01;
         }
 
         private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
-            center = MidPoint(new GeoCoordinate(start.Latitude, start.Longitude),
-                new GeoCoordinate(end.Latitude, end.Longitude));
-            TripTileCollection.Add(new Tile(start, end, center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
+            _center = MidPoint(new GeoCoordinate(_start.Latitude, _start.Longitude),
+                new GeoCoordinate(_end.Latitude, _end.Longitude));
+            TripTileCollection.Add(new Tile(_start, _end, _center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
             ChangeLocations();
         }
 
