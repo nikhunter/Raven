@@ -7,21 +7,33 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.JsonReader;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Button;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends Activity
 {
+    TextView date;
+    TextView time;
+    TextView kmh;
+    TextView rpm;
+    TextView lat;
+    TextView lng;
+
+
     TextView myLabel;
     EditText myTextbox;
     BluetoothAdapter mBluetoothAdapter;
@@ -43,12 +55,21 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        date = (TextView)findViewById(R.id.date);
+        time = (TextView)findViewById(R.id.time);
+        kmh = (TextView)findViewById(R.id.kmh);
+        rpm = (TextView)findViewById(R.id.rpm);
+        lat = (TextView)findViewById(R.id.lat);
+        lng = (TextView)findViewById(R.id.lng);
+
         Button openButton = (Button)findViewById(R.id.open);
         Button sendButton = (Button)findViewById(R.id.send);
         Button closeButton = (Button)findViewById(R.id.close);
         myLabel = (TextView)findViewById(R.id.label);
         myTextbox = (EditText)findViewById(R.id.entry);
         Log = (TextView)findViewById(R.id.Log);
+
+
 
         //Open Button
         openButton.setOnClickListener(new View.OnClickListener()
@@ -202,6 +223,18 @@ public class MainActivity extends Activity
         });
 
         workerThread.start();
+    }
+
+    void loadJson(String json){
+
+        JSONObject json = JSONObject(json);
+
+        date.setText();
+        time.setText();
+        kmh.setText();
+        date.setText();
+        date.setText();
+        date.setText();
     }
 
     void sendData() throws IOException

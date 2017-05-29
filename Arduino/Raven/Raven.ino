@@ -3,6 +3,7 @@
 #include <MultiLCD.h>
 #include <TinyGPS.h>
 #include <SD.h>
+#include <ArduinoJson.h>
 #include "Raven.h"
 #include "RavenOBD.h"
 
@@ -18,6 +19,7 @@ void setup() {
   lcd.print("MEMS:");
   lcd.println(hasMEMS ? "Yes" : "No");
 
+#if !DEBUG_MODE
   // send some commands for testing and show response for debugging purpose
   testOut();
 
@@ -26,6 +28,7 @@ void setup() {
     lcd.setCursor(0,0);
     lcd.println("Standby for OBD Connection");
   }
+#endif
 
   char buf[64];
   if (obd.getVIN(buf, sizeof(buf))) {
@@ -46,12 +49,21 @@ void setup() {
     }
     lcd.println();
   }
+  lcd.clear();
+  lcd.setFontSize(FONT_SIZE_XLARGE);
+  lcd.print("STATUS: ");
+  lcd.setColor(RGB16_GREEN);
+  lcd.println("ACTIVE");
+  lcd.println();
+  lcd.setColor(RGB16_WHITE);
   delay(3000);
 }
 
 void loop() {
-  readPIDs();
-   if (hasMEMS) {
+  //readPIDs();
+  processGPS();
+  /* if (hasMEMS) {
     readMEMS();
-  }
+  }*/
+  
 }
