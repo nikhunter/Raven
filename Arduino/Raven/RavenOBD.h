@@ -119,6 +119,8 @@ void readPIDs()
   json["10F"] = 87;
   json["111"] = 80;
   json["12F"] = 42;
+  json["lat"] = ((float)lat / 100000);
+  json["lng"] = ((float)lng / 100000);
 
   json.printTo(BT);
   BT.println();

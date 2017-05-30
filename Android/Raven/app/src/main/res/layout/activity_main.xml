@@ -9,18 +9,20 @@
         android:id="@+id/open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dip"
-        android:text="Open"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="10dip"
+        android:onClick="OpenBTBtn_OnClick"
+        android:text="Open" />
 
     <Button
         android:id="@+id/close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Close"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/open" />
+        android:layout_toStartOf="@+id/open"
+        android:onClick="CloseBTBtn_OnClick"
+        android:text="Close" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -28,9 +30,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/open"
-        android:columnCount="3"
-        android:rowCount="6"
-        >
+        android:id="@+id/gridLayout">
 
         <TextView
             android:layout_width="200px"
@@ -38,6 +38,7 @@
             android:layout_column="0"
             android:layout_row="0"
             android:text="Date" />
+
         <TextView
             android:layout_width="200px"
             android:layout_height="wrap_content"
@@ -72,6 +73,34 @@
         <TextView
             android:layout_width="200px"
             android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="6"
+            android:text="Stress" />
+
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="7"
+            android:text="Temp" />
+
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="8"
+            android:text="Throttle Pos" />
+
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="9"
+            android:text="Petrol Level" />
+
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_row="0"
             android:text="-" />
@@ -98,6 +127,36 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_row="4"
+            android:text="-" />
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="5"
+            android:text="-" />
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="6"
+            android:text="-" />
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="7"
+            android:text="-" />
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="8"
+            android:text="-" />
+        <TextView
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="9"
             android:text="-" />
         <TextView
             android:layout_width="200px"
@@ -142,6 +201,39 @@
             android:layout_height="wrap_content"
             android:layout_column="2"
             android:layout_row="5" />
+        <TextView
+            android:id="@+id/stress"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="6" />
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="7" />
+        <TextView
+            android:id="@+id/throttlepos"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="8" />
+        <TextView
+            android:id="@+id/petrollvl"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="9" />
     </GridLayout>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="49dp"
+        android:text="Button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
