@@ -14,14 +14,14 @@ COMMENT = 'Login table for Raven-GPS authentication';
 
 insert into logins (`reg`,`username`,`password`) values (
     "BK79499",
-    "RWejlgaard",
-    "E6C83B282AEB2E022844595721CC00BBDA47CB24537C1779F9BB84F04039E1676E6BA8573E588DA1052510E3AA0A32A9E55879AE22B0C2D62136FC0A3E85F8BB"
+    "rwejlgaard",
+    "B109F3BBBC244EB82441917ED06D618B9008DD09B3BEFD1B5E07394C706A8BB980B1D7785E5976EC049B46DF5F1326AF5A2EA6D103FD07C95385FFAB0CACBC86"
 );
 
 insert into logins (`reg`,`username`,`password`) values (
     "BE70846",
-    "NWMicheelsen",
-    "E6C83B282AEB2E022844595721CC00BBDA47CB24537C1779F9BB84F04039E1676E6BA8573E588DA1052510E3AA0A32A9E55879AE22B0C2D62136FC0A3E85F8BB"
+    "nwmicheelsen",
+    "B109F3BBBC244EB82441917ED06D618B9008DD09B3BEFD1B5E07394C706A8BB980B1D7785E5976EC049B46DF5F1326AF5A2EA6D103FD07C95385FFAB0CACBC86"
 );
 
 CREATE TABLE `raven`.`trips` (
@@ -47,7 +47,7 @@ insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_u
     STR_TO_DATE('05-18-2017 12:38:00','%m-%d-%Y %H:%i:%s'),
     "BK79499",
     "None",
-    "RWejlgaard"
+    "rwejlgaard"
 );
 
 insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_username`) values (
@@ -55,7 +55,7 @@ insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_u
     STR_TO_DATE('05-22-2017 14:43:25','%m-%d-%Y %H:%i:%s'),
     "BE70846",
     "None",
-    "NWMicheelsen"
+    "nwmicheelsen"
 );
 
 SELECT * FROM logins;
