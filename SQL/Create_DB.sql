@@ -29,7 +29,7 @@ CREATE TABLE `raven`.`trips` (
   `time_started` DATETIME NOT NULL,
   `time_ended` DATETIME NOT NULL,
   `driver_reg` VARCHAR(20) NOT NULL,
-  `log_file` MEDIUMBLOB NOT NULL,
+  `log_file` LONGBLOB NOT NULL,
   `driver_username` VARCHAR(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
@@ -46,7 +46,7 @@ insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_u
 	STR_TO_DATE('05-18-2017 12:00:00','%m-%d-%Y %H:%i:%s'),
     STR_TO_DATE('05-18-2017 12:38:00','%m-%d-%Y %H:%i:%s'),
     "BK79499",
-    "None",
+    load_file('/var/lib/mysql-files/trip1.json'),
     "rwejlgaard"
 );
 
@@ -54,7 +54,7 @@ insert into trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_u
 	STR_TO_DATE('05-22-2017 14:00:00','%m-%d-%Y %H:%i:%s'),
     STR_TO_DATE('05-22-2017 14:43:25','%m-%d-%Y %H:%i:%s'),
     "BE70846",
-    "None",
+    load_file('/var/lib/mysql-files/trip1.json'),
     "nwmicheelsen"
 );
 

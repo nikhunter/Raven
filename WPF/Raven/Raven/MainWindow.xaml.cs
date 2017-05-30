@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Device.Location;
+using System.IO;
+using System.IO.Compression;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
+using Newtonsoft.Json;
 using Raven.Windows;
 
 namespace Raven {
@@ -30,12 +36,10 @@ namespace Raven {
             InitializeComponent();
 
             loginWindow.Closed += delegate {
-                if (loginWindow.LoginSuccess)
-                {
+                if (loginWindow.LoginSuccess) {
                     Show();
                 }
-                else
-                {
+                else {
                     Close();
                 }
             };
@@ -57,15 +61,51 @@ namespace Raven {
                 using (MySqlDataReader dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
-                        string rowValue = row["log_file"].ToString();
+                        // TODO Convert row data to RootObject for Tile creation
+                        //var rowValue = row["log_file"].ToString();
 
-                        //MessageBox.Show(rowValue);
+                        //string json = @"{""key1"":""value1"",""key2"":""value2""}";
+
+                        //Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(rowValue);
+
+                        //foreach (var value in values) {
+                        //    MessageBox.Show(value.ToString());
+                        //}
                     }
                 }
             }
             catch (MySqlException exception) {
                 MessageBox.Show(exception.ToString());
             }
+        }
+
+        public static T Deserialize<T>(byte[] data) where T : class
+        {
+            using (var stream = new MemoryStream(data))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+                return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
+        }
+
+        public class RootObject
+        {
+            [JsonProperty(PropertyName = "TimeDelta")]
+            public string TimeDelta { get; set; }
+            [JsonProperty(PropertyName = "104")]
+            public string EngineLoad { get; set; }
+            [JsonProperty(PropertyName = "105")]
+            public string EngineCoolantTemp { get; set; }
+            [JsonProperty(PropertyName = "10C")]
+            public string RPM { get; set; }
+            [JsonProperty(PropertyName = "10D")]
+            public string Speed { get; set; }
+            [JsonProperty(PropertyName = "10E")]
+            public string TimingAdvance { get; set; }
+            [JsonProperty(PropertyName = "10F")]
+            public string IntakeAirTemp { get; set; }
+            [JsonProperty(PropertyName = "111")]
+            public string ThrottlePosition { get; set; }
+            [JsonProperty(PropertyName = "12F")]
+            public string FuelLevelInput { get; set; }
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e) {
