@@ -49,7 +49,6 @@ namespace Raven {
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
-        // TODO SELECT * FROM trips, and create TripTiles based on results
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
@@ -65,15 +64,9 @@ namespace Raven {
                         // TODO Convert row data to RootObject for Tile creation
                         var rowValue = row["log_file"].ToString();
 
-                        // Breaks on Line 667, Character 33 because ID '104' doesn't contain a value
-                        // {"TimeDelta": "872080", "104": , "105": 149, "10C": 3163, "10D": 92, "10E": 89, "10F": 91, "111": 97, "12F": ""},
-                        // I think it'll work after the NEW trip2.json file is uploaded
+                        List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(rowValue);
 
-                        // TODO Uncomment and test when the proper trip2.json file is uploaded
-                        //List<RootObject> result = JsonConvert.DeserializeObject<List<RootObject>>(rowValue);
-
-                        //JavaScriptSerializer serializer = new JavaScriptSerializer();
-                        //serializer.Deserialize<RootObject>(rowValue);
+                        // TODO Add TripTiles based on 'results'
                     }
                 }
             }
@@ -82,36 +75,33 @@ namespace Raven {
             }
         }
 
-        public static T Deserialize<T>(byte[] data) where T : class
-        {
-            using (var stream = new MemoryStream(data))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-                return JsonSerializer.Create().Deserialize(reader, typeof(T)) as T;
-        }
-
-        public class RootObject
-        {
+        public class RootObject {
             [JsonProperty(PropertyName = "TimeDelta")]
             public string TimeDelta { get; set; }
+
             [JsonProperty(PropertyName = "104")]
             public string EngineLoad { get; set; }
+
             [JsonProperty(PropertyName = "105")]
             public string EngineCoolantTemp { get; set; }
+
             [JsonProperty(PropertyName = "10C")]
             public string RPM { get; set; }
+
             [JsonProperty(PropertyName = "10D")]
             public string Speed { get; set; }
+
             [JsonProperty(PropertyName = "10E")]
             public string TimingAdvance { get; set; }
+
             [JsonProperty(PropertyName = "10F")]
             public string IntakeAirTemp { get; set; }
+
             [JsonProperty(PropertyName = "111")]
             public string ThrottlePosition { get; set; }
+
             [JsonProperty(PropertyName = "12F")]
             public string FuelLevelInput { get; set; }
-        }
-
-        private void MainWindow_OnClosed(object sender, EventArgs e) {
         }
 
         public void SqlGetByReg(string reg) {
@@ -187,7 +177,8 @@ namespace Raven {
         private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
             _center = MidPoint(new GeoCoordinate(_start.Latitude, _start.Longitude),
                 new GeoCoordinate(_end.Latitude, _end.Longitude));
-            TripTileCollection.Add(new Tile(_start, _end, _center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0, 15));
+            TripTileCollection.Add(new Tile(_start, _end, _center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0,
+                15));
             ChangeLocations();
         }
 

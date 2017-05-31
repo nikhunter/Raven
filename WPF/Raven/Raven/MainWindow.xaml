@@ -8,7 +8,7 @@
         xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:controls="clr-namespace:Raven.Controls"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Loaded="MainWindow_OnLoaded" Closed="MainWindow_OnClosed"
+        Loaded="MainWindow_OnLoaded"
         Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
     <Window.Resources>
@@ -173,7 +173,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!--VIN and distance-->
+                                    <!--VIN or REG and distance-->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="WF0DXXGAKDGL55839"
                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                                    Margin="3,0,0,0" />
