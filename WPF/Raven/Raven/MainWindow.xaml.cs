@@ -12,6 +12,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Newtonsoft.Json;
+using System.Web.Script.Serialization;
 using Raven.Windows;
 
 namespace Raven {
@@ -62,15 +63,17 @@ namespace Raven {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
                         // TODO Convert row data to RootObject for Tile creation
-                        //var rowValue = row["log_file"].ToString();
+                        var rowValue = row["log_file"].ToString();
 
-                        //string json = @"{""key1"":""value1"",""key2"":""value2""}";
+                        // Breaks on Line 667, Character 33 because ID '104' doesn't contain a value
+                        // {"TimeDelta": "872080", "104": , "105": 149, "10C": 3163, "10D": 92, "10E": 89, "10F": 91, "111": 97, "12F": ""},
+                        // I think it'll work after the NEW trip2.json file is uploaded
 
-                        //Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(rowValue);
+                        // TODO Uncomment and test when the proper trip2.json file is uploaded
+                        //List<RootObject> result = JsonConvert.DeserializeObject<List<RootObject>>(rowValue);
 
-                        //foreach (var value in values) {
-                        //    MessageBox.Show(value.ToString());
-                        //}
+                        //JavaScriptSerializer serializer = new JavaScriptSerializer();
+                        //serializer.Deserialize<RootObject>(rowValue);
                     }
                 }
             }
