@@ -28,9 +28,9 @@ CREATE TABLE `raven`.`trips` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `time_started` DATETIME NOT NULL,
   `time_ended` DATETIME NOT NULL,
+  `driver_username` VARCHAR(32) NOT NULL,
   `driver_reg` VARCHAR(20) NOT NULL,
   `log_file` LONGTEXT NOT NULL,
-  `driver_username` VARCHAR(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `reg_idx` (`driver_reg` ASC),
@@ -42,20 +42,20 @@ CREATE TABLE `raven`.`trips` (
     ON UPDATE NO ACTION)
 COMMENT = 'Trip table for Raven-GPS';
 
-INSERT INTO trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_username`) VALUES (
+INSERT INTO trips (`time_started`,`time_ended`,`driver_username`,`driver_reg`,`log_file`) VALUES (
 	STR_TO_DATE('05/18/2017 12:00:00','%m/%d/%Y %H:%i:%s'),
     STR_TO_DATE('05/18/2017 12:38:00','%m/%d/%Y %H:%i:%s'),
+    "rwejlgaard",
     "BK79499",
-    load_file('/var/lib/mysql-files/trip2.json'),
-    "rwejlgaard"
+    load_file('/var/lib/mysql-files/trip2.json')
 );
 
-INSERT INTO trips (`time_started`,`time_ended`,`driver_reg`,`log_file`,`driver_username`) VALUES (
+INSERT INTO trips (`time_started`,`time_ended`,`driver_username`,`driver_reg`,`log_file`) VALUES (
 	STR_TO_DATE('05/22/2017 14:00:00','%m/%d/%Y %H:%i:%s'),
     STR_TO_DATE('05/23/2017 14:43:25','%m/%d/%Y %H:%i:%s'),
+    "nwmicheelsen",
     "BE70846",
-    load_file('/var/lib/mysql-files/trip2.json'),
-    "nwmicheelsen"
+    load_file('/var/lib/mysql-files/trip2.json')
 );
 
 SELECT * FROM logins;
