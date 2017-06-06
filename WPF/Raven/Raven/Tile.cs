@@ -18,9 +18,9 @@ namespace Raven
         public string Date { get; set; }
         public string TimeStarted { get; set; }
         public double Distance { get; set; }
-        public int Duration { get; set; }
+        public string Duration { get; set; }
 
-        public Tile(Location startLocation, Location endLocation, Location center, int zoomLevel, MapLayer route, string title, string date, string timeStarted, double distance, int duration) {
+        public Tile(Location startLocation, Location endLocation, Location center, int zoomLevel, MapLayer route, string title, string date, string timeStarted, double distance, string duration) {
             StartLocation = startLocation;
             EndLocation = endLocation;
             CenterLocation = center;

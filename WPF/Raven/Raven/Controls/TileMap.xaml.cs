@@ -24,14 +24,19 @@ namespace Raven.Controls {
             ObservableCollection<Tile> pins = MainWindow.TripTileCollection;
             InitializeComponent();
 
-            TripTileMap.Center = pins[pins.Count-1].CenterLocation;
-            TripTileMap.ZoomLevel = pins[pins.Count - 1].ZoomLevel;
+            try {
+                TripTileMap.Center = pins[pins.Count - 1].CenterLocation;
+                TripTileMap.ZoomLevel = pins[pins.Count - 1].ZoomLevel;
 
-            Pushpin startLocation = new Pushpin { Location = pins[pins.Count - 1].StartLocation };
-            Pushpin endLocation = new Pushpin { Location = pins[pins.Count - 1].EndLocation };
+                Pushpin startLocation = new Pushpin {Location = pins[pins.Count - 1].StartLocation};
+                Pushpin endLocation = new Pushpin {Location = pins[pins.Count - 1].EndLocation};
 
-            TripTileMap.Children.Add(startLocation);
-            TripTileMap.Children.Add(endLocation);
+                TripTileMap.Children.Add(startLocation);
+                TripTileMap.Children.Add(endLocation);
+            }
+            catch (Exception) {
+                // ignored
+            }
         }
     }
 }
