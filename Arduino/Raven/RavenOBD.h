@@ -1,15 +1,10 @@
 bool hasMEMS;
 int deltatime = 0;
 
-int32_t lat, lng;
-static uint32_t distance = 0;
-static uint32_t startTime = 0;
-static uint16_t lastSpeed = 0;
-static uint32_t lastSpeedTime = 0;
-static uint32_t gpsDate = 0;
-uint32_t dataTime;
-static uint32_t lastGPSDataTime = 0;
-
+long lat, lng;
+unsigned long fix_age, time, date, speed, course;
+unsigned long chars;
+unsigned short sentences, failed_checksum;
 
 void testOut()
 {
@@ -101,78 +96,54 @@ void readPIDs()
             json[pidHex] = "";
           }
        }
+
+       json["lat"] = ((float)lat / 100000);
+       json["lng"] = ((float)lng / 100000);
+       json["date"] = date;
+       json["time"] = time; 
        
        json.printTo(BT);
        BT.println();
        deltatime = millis();
-       delay(1000);
+       //delay(1000);
 #endif
 #if DEBUG_MODE
-  String out = "";
 
   json["timeDelta"] = 4242;
-  json["104"] = 104;
-  json["105"] = 92;
   json["10C"] = 845;
   json["10D"] = 68;
-  json["10E"] = 76;
-  json["10F"] = 87;
-  json["111"] = 80;
-  json["12F"] = 42;
+  json["date"] = date;
+  json["time"] = time; 
   json["lat"] = ((float)lat / 100000);
   json["lng"] = ((float)lng / 100000);
+  
 
   json.printTo(BT);
-  BT.println();
-  delay(1000);
+  BT.println("");
+  //delay(1000);
 
 #endif
      
      
 }
 
-void processGPS()
-{
-    // process GPS data
-    char c = GPS.read();
-    if (!gps.encode(c))
-        return;
-
-    // parsed GPS data is ready
-    uint32_t time;
-    uint32_t date;
-
-    
-
-    /*gps.get_datetime(&date, &time, 0);
-    if (date != gpsDate) {
-        // log date only if it's changed and valid
-        int year = date % 100;
-        if (date < 1000000 && date >= 10000 && year >= 15 && (gpsDate == 0 || year - (gpsDate % 100) <= 1)) {
-          gpsDate = date;
-        }
-    }*/
-
-    gps.get_position(&lat, &lng, 0);
-
-    BT.println("lat: " + lat);
-    BT.println("lng: " + lng);
-
-    // keep current data time as last GPS time
-    //lastGPSDataTime = dataTime;
-
-    /*// display UTC date/time
-    lcd.setFlags(FLAG_PAD_ZERO);
-    lcd.setCursor(216, 24);
-    lcd.printLong(time, 8);
-
-    // display latitude
-    lcd.setCursor(216, 27);
-    lcd.print((float)lat / 100000, 5);
-    // display longitude
-    lcd.setCursor(216, 30);
-    lcd.print((float)lng / 100000, 5);
-    lcd.setFlags(0);*/
-    
+void processGPS(){
+   while (GPS.available()){
+      int c = GPS.read();
+      if (gps.encode(c)){         
+        // retrieves +/- lat/long in 100000ths of a degree
+        gps.get_position(&lat, &lng, &fix_age);
+         
+        // time in hhmmsscc, date in ddmmyy
+        gps.get_datetime(&date, &time, &fix_age);
+         
+        // returns speed in 100ths of a knot
+        speed = gps.speed();
+         
+        // course in 100ths of a degree
+        course = gps.course();
+        
+      }
+   }
 }
 
