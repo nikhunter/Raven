@@ -6,7 +6,7 @@ trips (id, time_started, time_ended, driver_username, driver_reg, log_file)
 
 
 Relations:
-drivers(username) to logins(username)							[1-1]
-drivers(reg) to cars(reg)										[1-Many]
-cars(driver) to drivers(reg)									[Many-Many]
+drivers(username) to logins(username)				[1-1]
+drivers(reg) to cars(reg)					[1-Many]
+cars(driver) to drivers(reg)					[Many-Many]
 trips(driver_username, driver_reg) to drivers(username, reg)	[1-1]

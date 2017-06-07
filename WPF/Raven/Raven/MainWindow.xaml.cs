@@ -5,15 +5,12 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Device.Location;
-using System.IO;
-using System.IO.Compression;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Newtonsoft.Json;
-using System.Web.Script.Serialization;
 using Raven.Windows;
 
 namespace Raven {
@@ -34,7 +31,9 @@ namespace Raven {
             InitializeComponent();
 
             loginWindow.Closed += delegate {
-                if (loginWindow.LoginSuccess) {
+                if (loginWindow.LoginSuccess)
+                {
+                    LoadTripTiles();
                     Show();
                 }
                 else {
@@ -46,7 +45,7 @@ namespace Raven {
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
+        private void LoadTripTiles() {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
             connection.Open();
@@ -58,40 +57,56 @@ namespace Raven {
                 using (MySqlDataReader dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
-                        // TODO Convert row data to RootObject for Tile creation
-                        var logs = row["log_file"].ToString();
-                        var title = row["driver_reg"].ToString();
-                        var date = row["time_started"].ToString();
-                        DateTime dateStart = DateTime.Parse(row["time_started"].ToString());
-                        DateTime dateEnd = DateTime.Parse(row["time_ended"].ToString());
+                        try {
+                            // TODO Convert row data to RootObject for Tile creation
+                            var logs = row["log_file"].ToString();
+                            var title = row["driver_reg"].ToString();
+                            var date = row["time_started"].ToString();
+                            DateTime dateStart = DateTime.Parse(row["time_started"].ToString());
+                            DateTime dateEnd = DateTime.Parse(row["time_ended"].ToString());
 
-                        // TODO Fetch coordinates of first and last 'result'
-                        List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
+                            // TODO Fetch coordinates of first and last 'result'
+                            List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
 
-                        // Format date
-                        date = date.Replace('-', '/');
-                        date = date.Replace(" ", " - ");
+                            // Format date
+                            date = date.Replace('-', '/');
+                            date = date.Replace(" ", " - ");
 
-                        // Calculate distance // TODO Get the total distance between all pins
-                        // foreach (row in results)
-                        // Find distance, add it to Total
-                        // var distance = total;
+                            // Calculate distance // TODO Get the total distance between all pins
+                            // foreach (row in results)
+                            // Find distance, add it to Total
+                            // var distance = total;
 
-                        // Calculate duration // TODO Separate time from time_started/time_ended
-                        string duration;
-                        TimeSpan difference = dateEnd - dateStart;
-                        if (difference.TotalDays >= 1) {
-                            duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
+                            // Calculate duration // TODO Separate time from time_started/time_ended
+                            string duration;
+                            TimeSpan difference = dateEnd - dateStart;
+                            if (difference.TotalDays >= 1)
+                            {
+                                duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else if (difference.TotalHours >= 1)
+                            {
+                                duration = difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else
+                            {
+                                duration = difference.Minutes + "m";
+                            }
+
+
+                            // TESTING PURPOSES ONLY
+                            Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
+                            Location centerLocation = new Location(double.Parse(results[1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[1].Longitude, CultureInfo.InvariantCulture));
+                            Location endLocation = new Location(double.Parse(results[2].Latitude, CultureInfo.InvariantCulture), double.Parse(results[2].Longitude, CultureInfo.InvariantCulture));
+                            // TESTING PURPOSES ONLY
+
+
+                            // TODO Add TripTiles based on 'results'
+                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, null, 20, duration));
                         }
-                        else if (difference.TotalHours >= 1) {
-                            duration = difference.Hours + "h " + difference.Minutes + "m";
+                        catch (Exception) {
+                            //ignore
                         }
-                        else {
-                            duration = difference.Minutes + "m";
-                        }
-
-                        // TODO Add TripTiles based on 'results'
-                        TripTileCollection.Add(new Tile(null, null, null, 14, null, title, date, null, 20, duration));
                     }
                 }
             }
@@ -127,14 +142,12 @@ namespace Raven {
 
             [JsonProperty(PropertyName = "12F")]
             public string FuelLevelInput { get; set; }
-
-            /*
+            
             [JsonProperty(PropertyName = "lat")]
             public string Latitude { get; set; }
 
             [JsonProperty(PropertyName = "lng")]
             public string Longitude { get; set; }
-            */
         }
 
         public void SqlGetByReg(string reg) {
