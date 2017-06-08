@@ -31,8 +31,7 @@ namespace Raven {
             InitializeComponent();
 
             loginWindow.Closed += delegate {
-                if (loginWindow.LoginSuccess)
-                {
+                if (loginWindow.LoginSuccess) {
                     LoadTripTiles();
                     Show();
                 }
@@ -45,7 +44,7 @@ namespace Raven {
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
-        private void LoadTripTiles() {
+        private static void LoadTripTiles() {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
             connection.Open();
@@ -68,41 +67,42 @@ namespace Raven {
                             // TODO Fetch coordinates of first and last 'result'
                             List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
 
-                            // Format date
-                            date = date.Replace('-', '/');
-                            date = date.Replace(" ", " - ");
-
-                            // Calculate distance // TODO Get the total distance between all pins
-                            // foreach (row in results)
-                            // Find distance, add it to Total
-                            // var distance = total;
-
-                            // Calculate duration // TODO Separate time from time_started/time_ended
-                            string duration;
-                            TimeSpan difference = dateEnd - dateStart;
-                            if (difference.TotalDays >= 1)
-                            {
-                                duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
-                            }
-                            else if (difference.TotalHours >= 1)
-                            {
-                                duration = difference.Hours + "h " + difference.Minutes + "m";
-                            }
-                            else
-                            {
-                                duration = difference.Minutes + "m";
-                            }
-
-
                             // TESTING PURPOSES ONLY
                             Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
                             Location centerLocation = new Location(double.Parse(results[1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[1].Longitude, CultureInfo.InvariantCulture));
                             Location endLocation = new Location(double.Parse(results[2].Latitude, CultureInfo.InvariantCulture), double.Parse(results[2].Longitude, CultureInfo.InvariantCulture));
                             // TESTING PURPOSES ONLY
 
+                            // Set ZoomLevel to fit all pins
 
-                            // TODO Add TripTiles based on 'results'
-                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, null, 20, duration));
+                            // Create MapLayer of driven route
+
+                            // Format date
+                            date = date.Replace('-', '/');
+                            date = date.Replace(" ", " - ");
+
+                            // Calculate distance // TODO Get the total distance between all pins
+                            var distance = CalculateDistance(startLocation, endLocation) / 1000; // TEMPORARILY - Bird flight distance only
+                            // foreach (row in results)
+                            // Find distance, add it to Total
+                            // var distance = total;
+
+                            // Calculate duration
+                            // MAYBE Change to get difference between first and last index of 'results' collection
+                            string duration;
+                            TimeSpan difference = dateEnd - dateStart;
+                            if (difference.TotalDays >= 1) {
+                                duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else if (difference.TotalHours >= 1) {
+                                duration = difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else {
+                                duration = difference.Minutes + "m";
+                            }
+
+                            // Create TripTile
+                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, distance, duration));
                         }
                         catch (Exception) {
                             //ignore
@@ -116,37 +116,19 @@ namespace Raven {
         }
 
         public class RootObject {
-            [JsonProperty(PropertyName = "TimeDelta")]
-            public string TimeDelta { get; set; }
+            [JsonProperty(PropertyName = "DeltaTime")]
+            public string DeltaTime { get; set; }
 
-            [JsonProperty(PropertyName = "104")]
-            public string EngineLoad { get; set; }
-
-            [JsonProperty(PropertyName = "105")]
-            public string EngineCoolantTemp { get; set; }
-
-            [JsonProperty(PropertyName = "10C")]
+            [JsonProperty(PropertyName = "Rpm")]
             public string Rpm { get; set; }
 
-            [JsonProperty(PropertyName = "10D")]
+            [JsonProperty(PropertyName = "Speed")]
             public string Speed { get; set; }
 
-            [JsonProperty(PropertyName = "10E")]
-            public string TimingAdvance { get; set; }
-
-            [JsonProperty(PropertyName = "10F")]
-            public string IntakeAirTemp { get; set; }
-
-            [JsonProperty(PropertyName = "111")]
-            public string ThrottlePosition { get; set; }
-
-            [JsonProperty(PropertyName = "12F")]
-            public string FuelLevelInput { get; set; }
-            
-            [JsonProperty(PropertyName = "lat")]
+            [JsonProperty(PropertyName = "Lat")]
             public string Latitude { get; set; }
 
-            [JsonProperty(PropertyName = "lng")]
+            [JsonProperty(PropertyName = "Lng")]
             public string Longitude { get; set; }
         }
 
@@ -177,12 +159,17 @@ namespace Raven {
                 var firstCoordinate = new GeoCoordinate(previousPin.Longitude, previousPin.Latitude);
                 var secondCoordinate = new GeoCoordinate(currentPin.Longitude, currentPin.Latitude);
 
-                // Returns distance in meters
                 return firstCoordinate.GetDistanceTo(secondCoordinate);
             }
             catch (Exception) {
                 return 0;
             }
+        }
+
+        public static string DoFormat(double myNumber) {
+            var s = $"{myNumber:0.00}";
+
+            return s.EndsWith("00") ? myNumber.ToString() : s;
         }
 
         public Location MidPoint(GeoCoordinate posA, GeoCoordinate posB) {

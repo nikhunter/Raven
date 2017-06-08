@@ -219,7 +219,7 @@
                                     </TextBlock>
                                     <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
                                                    VerticalAlignment="Bottom" Margin="0,3,8,0">
-                                            <Run Text="{Binding Path=Distance}" />
+                                            <Run Text="{Binding Path=Distance, StringFormat=f2}"/>
                                             <Run Text="km" />
                                     </TextBlock>
 

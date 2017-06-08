@@ -44,7 +44,7 @@ namespace Raven.Windows {
         }
 
         public LoginWindow() {
-            InitializeComponent();
+            InitializeComponent(); // TODO Figure out how to get the close button back
         }
 
         private void LoginBtn_Click(object sender, RoutedEventArgs e) {
