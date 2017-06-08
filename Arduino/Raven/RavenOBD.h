@@ -1,7 +1,8 @@
 bool hasMEMS;
-int deltatime = 0;
+int deltaTime = 0;
 
 long lat, lng;
+int rpm,_speed;
 unsigned long fix_age, time, date, speed, course;
 unsigned long chars;
 unsigned short sentences, failed_checksum;
@@ -38,74 +39,46 @@ void testOut()
     lcd.clear();
 }
 
-void readMEMS()
-{
-    int acc[3];
-    int gyro[3];
-    int temp;
-
-    if (!obd.memsRead(acc, gyro, 0, &temp)) return;
-
-    BT.print('[');
-    BT.print(millis());
-    BT.print(']');
-
-    BT.print("ACC:");
-    BT.print(acc[0]);
-    BT.print('/');
-    BT.print(acc[1]);
-    BT.print('/');
-    BT.print(acc[2]);
-
-    BT.print(" GYRO:");
-    BT.print(gyro[0]);
-    BT.print('/');
-    BT.print(gyro[1]);
-    BT.print('/');
-    BT.print(gyro[2]);
-
-    BT.print(" TEMP:");
-    BT.print((float)temp / 10, 1);
-    BT.println("C");
-}
-
 void readPIDs()
 {
-    static const byte pidlist[] = {PID_ENGINE_LOAD, PID_COOLANT_TEMP, PID_RPM, PID_SPEED, PID_TIMING_ADVANCE, PID_INTAKE_TEMP, PID_THROTTLE, PID_FUEL_LEVEL};
+    //static const byte pidlist[] = {0x0C, 0x0D};
 
       StaticJsonBuffer<200> jsonBuffer;
       JsonObject& json = jsonBuffer.createObject();
 
 #if !DEBUG_MODE
 
-      json["timeDelta"] = millis();
+      json["DeltaTime"] = millis();
+
+      static const byte pidlist[] = {PID_RPM, PID_SPEED};
+
+      static const String pidNames[] = {"Rpm", "Speed"};
       
       for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
           byte pid = pidlist[i];
           bool valid = obd.isValidPID(pid);
           
-          String pidHex = (String) ((int)pid | 0x100, HEX);
-          
           if (valid) {
               int value;
               if (obd.readPID(pid, value)) {
-                json[pidHex] = value;
+                //BT.print(value);
+                
+                //String pidHex = (String) ((int)pid | 0x100, HEX); 
+                json[pidNames[i]] = value;
               }
-          }
-          else{
-            json[pidHex] = "";
+          }else{
+            json[pidNames[i]] = "";  
           }
        }
 
-       json["lat"] = ((float)lat / 100000);
-       json["lng"] = ((float)lng / 100000);
-       json["date"] = date;
-       json["time"] = time; 
+       json["Lat"] = ((float)lat / 100000);
+       json["Lng"] = ((float)lng / 100000);
+       json["Date"] = date;
+       json["Time"] = time;
+
+       rpm = json["Rpm"];
+       _speed = json["Speed"];
        
-       json.printTo(BT);
-       BT.println();
-       deltatime = millis();
-       //delay(1000);
 #endif
 #if DEBUG_MODE
 
@@ -117,14 +90,12 @@ void readPIDs()
   json["lat"] = ((float)lat / 100000);
   json["lng"] = ((float)lng / 100000);
   
+#endif
 
   json.printTo(BT);
   BT.println("");
-  //delay(1000);
-
-#endif
-     
-     
+  delay(500);
+  deltaTime = millis();
 }
 
 void processGPS(){

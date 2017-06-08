@@ -1,11 +1,10 @@
 #include <Arduino.h>
+#include <OBD.h>
 #include <SD.h>
 #include <SPI.h>
 #include <TFT.h>
-#include <OBD.h>
 #include <MultiLCD.h>
 #include <TinyGPS.h>
-
 #include <ArduinoJson.h>
 #include "Raven.h"
 #include "RavenOBD.h"
@@ -84,8 +83,10 @@ void loop() {
   lcd.setCursor(0,8);
   lcd.print("time: ");
   lcd.print(time);
-  /* if (hasMEMS) {
-    readMEMS();
-  }*/
-  
+  lcd.setCursor(0,10);
+  lcd.print("RPM: ");
+  lcd.print(rpm);
+  lcd.setCursor(0,12);
+  lcd.print("Speed: ");
+  lcd.print(_speed);  
 }
