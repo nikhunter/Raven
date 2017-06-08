@@ -8,6 +8,7 @@ using System.Device.Location;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Newtonsoft.Json;
@@ -44,7 +45,7 @@ namespace Raven {
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
-        private static void LoadTripTiles() {
+        private void LoadTripTiles() {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
             connection.Open();
@@ -53,6 +54,7 @@ namespace Raven {
                 MySqlCommand command = connection.CreateCommand();
                 command.CommandText = $"SELECT * FROM trips";
 
+                // TODO Make this into a separate method
                 using (MySqlDataReader dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
@@ -69,13 +71,27 @@ namespace Raven {
 
                             // TESTING PURPOSES ONLY
                             Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
-                            Location centerLocation = new Location(double.Parse(results[1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[1].Longitude, CultureInfo.InvariantCulture));
-                            Location endLocation = new Location(double.Parse(results[2].Latitude, CultureInfo.InvariantCulture), double.Parse(results[2].Longitude, CultureInfo.InvariantCulture));
+                            Location endLocation = new Location(double.Parse(results[results.Count - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[results.Count - 1].Longitude, CultureInfo.InvariantCulture));
+                            Location centerLocation = MidPoint(new GeoCoordinate(startLocation.Latitude, startLocation.Longitude), new GeoCoordinate(endLocation.Latitude, endLocation.Longitude));
                             // TESTING PURPOSES ONLY
 
                             // Set ZoomLevel to fit all pins
 
                             // Create MapLayer of driven route
+                            MapLayer polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
+                                for (var i = 1; i < results.Count; i=i+3) {
+                                    var polyLine = new MapPolyline();
+                                    var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
+                                    polyLine.Stroke = colourBrush;
+                                    polyLine.StrokeThickness = 1;
+                                    polyLine.Opacity = 1.0;
+
+                                    polyLine.Locations = new LocationCollection {
+                                        new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
+                                        new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
+                                    };
+                                    polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
+                                }
 
                             // Format date
                             date = date.Replace('-', '/');
@@ -102,7 +118,7 @@ namespace Raven {
                             }
 
                             // Create TripTile
-                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, distance, duration));
+                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, polyLineLayer, title, date, distance, duration));
                         }
                         catch (Exception) {
                             //ignore
@@ -189,7 +205,7 @@ namespace Raven {
             midPoint.Longitude = posA.Longitude +
                                  RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
 
-            return new Location(midPoint.Latitude, midPoint.Longitude);
+            return new Location(midPoint.Latitude + 0.007, midPoint.Longitude);
         }
 
         public double DegreeToRadian(double angle) {

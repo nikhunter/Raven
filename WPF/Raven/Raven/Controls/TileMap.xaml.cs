@@ -33,6 +33,8 @@ namespace Raven.Controls {
 
                 TripTileMap.Children.Add(startLocation);
                 TripTileMap.Children.Add(endLocation);
+
+                TripTileMap.Children.Add(pins[pins.Count - 1].Route);
             }
             catch (Exception) {
                 // ignored
