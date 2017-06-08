@@ -79,19 +79,19 @@ namespace Raven {
 
                             // Create MapLayer of driven route
                             MapLayer polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
-                                for (var i = 1; i < results.Count; i=i+3) {
-                                    var polyLine = new MapPolyline();
-                                    var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
-                                    polyLine.Stroke = colourBrush;
-                                    polyLine.StrokeThickness = 1;
-                                    polyLine.Opacity = 1.0;
+                            for (var i = 1; i < results.Count; i++) {
+                                var polyLine = new MapPolyline();
+                                var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
+                                polyLine.Stroke = colourBrush;
+                                polyLine.StrokeThickness = 1;
+                                polyLine.Opacity = 1.0;
 
-                                    polyLine.Locations = new LocationCollection {
-                                        new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
-                                        new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
-                                    };
-                                    polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
-                                }
+                                polyLine.Locations = new LocationCollection {
+                                    new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
+                                    new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
+                                };
+                                polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
+                            }
 
                             // Format date
                             date = date.Replace('-', '/');
@@ -182,12 +182,7 @@ namespace Raven {
             }
         }
 
-        public static string DoFormat(double myNumber) {
-            var s = $"{myNumber:0.00}";
-
-            return s.EndsWith("00") ? myNumber.ToString() : s;
-        }
-
+        // Returns the Location in the middle of two GeoCoordinates, with an added offset for the big map pins from Bing
         public Location MidPoint(GeoCoordinate posA, GeoCoordinate posB) {
             GeoCoordinate midPoint = new GeoCoordinate();
 
@@ -200,7 +195,6 @@ namespace Raven {
                 Math.Sqrt(
                     (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) *
                     (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) + by * by)));
-            // (Math.Cos(DegreesToRadians(posA.Latitude))) + Bx) + By * By)); // Your Code
 
             midPoint.Longitude = posA.Longitude +
                                  RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
