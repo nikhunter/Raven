@@ -1,29 +1,25 @@
 #include <Arduino.h>
-#include <SPI.h>
 #include <OBD.h>
+#include <SD.h>
+#include <SPI.h>
+#include <TFT.h>
 #include <MultiLCD.h>
 #include <TinyGPS.h>
-#include <SD.h>
 #include <ArduinoJson.h>
 #include "Raven.h"
 #include "RavenOBD.h"
 #include "images.h"
 
-#define PixSizeX  500
-#define PixOffsX  0
-
-#define PixSizeY  300
-#define PixOffsY  0
-
 void setup() {
   // put your setup code here, to run once:
   lcd.begin();
-
+  GPS.begin(115200);
   BT.begin(9600);
-  lcd.setXY(250 - (128 / 2),150 - (128 / 2));
-  lcd.draw(*logo, 128,128);
-  lcd.setXY(250 - (122 / 2),150 + (128 / 2) + 5);
-  lcd.draw(*logotext, 122,20);
+  //lcd.setXY(250 - (128 / 2),150 - (128 / 2));
+  //lcd.draw(RavenArudino, 128,128);
+  //lcd.setXY(250 - (122 / 2),150 + (128 / 2) + 5);
+  //lcd.drawBitmap(0,0, 128,128, "logo.bmp", 0,0,0);
+  //lcd.image(logo, 250 - (128 / 2),150 - (128 / 2));
   //delay(500);
   obd.begin();  
   delay(3000);
@@ -73,7 +69,7 @@ void setup() {
 }
 
 void loop() {
-  //readPIDs();
+  readPIDs();
   processGPS();
   lcd.setCursor(0,2);
   lcd.print("lat: ");
@@ -81,8 +77,16 @@ void loop() {
   lcd.setCursor(0,4);
   lcd.print("lng: ");
   lcd.print((float)lng / 100000, 5);
-  /* if (hasMEMS) {
-    readMEMS();
-  }*/
-  
+  lcd.setCursor(0,6);
+  lcd.print("date: ");
+  lcd.print(date);
+  lcd.setCursor(0,8);
+  lcd.print("time: ");
+  lcd.print(time);
+  lcd.setCursor(0,10);
+  lcd.print("RPM: ");
+  lcd.print(rpm);
+  lcd.setCursor(0,12);
+  lcd.print("Speed: ");
+  lcd.print(_speed);  
 }
