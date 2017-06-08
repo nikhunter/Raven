@@ -8,16 +8,55 @@
         xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:controls="clr-namespace:Raven.Controls"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Loaded="MainWindow_OnLoaded"
         Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
     <Window.Resources>
         <!-- TextBox Filters -->
-        <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        <Style x:Key="SearchDetailsStyle" TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Search" Foreground="LightGray" />
+                        <Label Content="VIN / REG / Username / Alias" Foreground="Gray" />
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SearchDateStartStyle" TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Style.Resources>
+                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                    <VisualBrush.Visual>
+                        <Label Content="Date Start" Foreground="Gray" />
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SearchDateEndStyle" TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Style.Resources>
+                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                    <VisualBrush.Visual>
+                        <Label Content="Date End" Foreground="Gray" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -132,15 +171,15 @@
         </Grid.ColumnDefinitions>
 
         <!-- VIN / REG / Driver Filter -->
-        <TextBox Grid.Row="0" Grid.Column="0" Width="300" HorizontalAlignment="Left" Margin="10" FontSize="18" />
+        <TextBox x:Name="SearchDetailsBox" Grid.Row="0" Grid.Column="0" Width="300" Style="{StaticResource SearchDetailsStyle}" HorizontalAlignment="Left" Margin="10" FontSize="18" />
 
         <!-- Date Start - Date End Filters -->
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
-            <Button x:Name="TileBtn" Click="TileBtn_OnClick" Content="Create Tile" Width="100" Height="24" />
-            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" />
+            <Button x:Name="TileBtn" Content="Create Tile" Width="100" Height="24" />
+            <TextBox x:Name="SearchDateStartBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" Style="{StaticResource SearchDateStartStyle}"/>
             <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2" />
-            <TextBox Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" />
+            <TextBox x:Name="SearchDateEndBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" Style="{StaticResource SearchDateEndStyle}" />
         </StackPanel>
 
         <!-- TripTile Section -->
@@ -174,38 +213,24 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!--VIN or REG and distance-->
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="WF0DXXGAKDGL55839"
+                                    <TextBlock Grid.Row="0" Grid.Column="0"  Text="{Binding Path=Title}"
                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                                   Margin="3,0,0,0" />
+                                                   Margin="8,3,0,0">
+                                    </TextBlock>
                                     <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Margin="0,0,3,0">
-                                            <Run Text="17.2" />
+                                                   VerticalAlignment="Bottom" Margin="0,3,8,0">
+                                            <Run Text="{Binding Path=Distance}" />
                                             <Run Text="km" />
                                     </TextBlock>
 
                                     <!--Date, time and duration-->
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="3,0,0,0"
-                                                   HorizontalAlignment="Left" VerticalAlignment="Top">
-                                            <Run Text="17/05/2017" />
-                                            <Run Text="-" />
-                                            <Run Text="14:30" />
-                                    </TextBlock>
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,3,0"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Top">
-                                            <Run Text="20" />
-                                            <Run Text="min" />
-                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=Date}" Margin="8,0,0,0"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding Path=Duration}" Grid.Column="1" Margin="0,0,8,0"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Top"/>
 
                                     <!--Map-->
-                                    <controls:TileMap Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
-                                    <!--<m:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road"
-                                               Center="{Binding Center}" ZoomLevel="{Binding ZoomLevel}" Grid.Row="2"
-                                               Grid.Column="0" Grid.ColumnSpan="2" Height="Auto" Width="Auto"
-                                               MapForegroundStyle="{StaticResource MapForegroundStyle}"
-                                               CredentialsProvider="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm">
-                                        <m:Pushpin Location="{Binding StartLocation}"/>
-                                        <m:Pushpin Location="{Binding EndLocation}"/>
-                                    </m:Map>-->
+                                    <controls:TileMap Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0"/>
                                 </Grid>
                             </Border>
                         </Border>

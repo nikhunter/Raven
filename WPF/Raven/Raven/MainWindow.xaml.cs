@@ -5,14 +5,12 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Device.Location;
-using System.IO;
-using System.IO.Compression;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Newtonsoft.Json;
-using System.Web.Script.Serialization;
 using Raven.Windows;
 
 namespace Raven {
@@ -25,10 +23,6 @@ namespace Raven {
 
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
 
-        private readonly Location _start = new Location(55.758019, 12.392440);
-        private readonly Location _end = new Location(55.759491, 12.457088);
-        private Location _center;
-
         public MainWindow() {
             // Initiate LoginWindow element
             var loginWindow = new LoginWindow();
@@ -37,7 +31,9 @@ namespace Raven {
             InitializeComponent();
 
             loginWindow.Closed += delegate {
-                if (loginWindow.LoginSuccess) {
+                if (loginWindow.LoginSuccess)
+                {
+                    LoadTripTiles();
                     Show();
                 }
                 else {
@@ -49,7 +45,7 @@ namespace Raven {
                 new FrameworkPropertyMetadata(Int32.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
+        private void LoadTripTiles() {
             MySqlConnection connection = new MySqlConnection(ConnectionString);
             DataTable dt = new DataTable();
             connection.Open();
@@ -61,12 +57,56 @@ namespace Raven {
                 using (MySqlDataReader dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
-                        // TODO Convert row data to RootObject for Tile creation
-                        var rowValue = row["log_file"].ToString();
+                        try {
+                            // TODO Convert row data to RootObject for Tile creation
+                            var logs = row["log_file"].ToString();
+                            var title = row["driver_reg"].ToString();
+                            var date = row["time_started"].ToString();
+                            DateTime dateStart = DateTime.Parse(row["time_started"].ToString());
+                            DateTime dateEnd = DateTime.Parse(row["time_ended"].ToString());
 
-                        List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(rowValue);
+                            // TODO Fetch coordinates of first and last 'result'
+                            List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
 
-                        // TODO Add TripTiles based on 'results'
+                            // Format date
+                            date = date.Replace('-', '/');
+                            date = date.Replace(" ", " - ");
+
+                            // Calculate distance // TODO Get the total distance between all pins
+                            // foreach (row in results)
+                            // Find distance, add it to Total
+                            // var distance = total;
+
+                            // Calculate duration // TODO Separate time from time_started/time_ended
+                            string duration;
+                            TimeSpan difference = dateEnd - dateStart;
+                            if (difference.TotalDays >= 1)
+                            {
+                                duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else if (difference.TotalHours >= 1)
+                            {
+                                duration = difference.Hours + "h " + difference.Minutes + "m";
+                            }
+                            else
+                            {
+                                duration = difference.Minutes + "m";
+                            }
+
+
+                            // TESTING PURPOSES ONLY
+                            Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
+                            Location centerLocation = new Location(double.Parse(results[1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[1].Longitude, CultureInfo.InvariantCulture));
+                            Location endLocation = new Location(double.Parse(results[2].Latitude, CultureInfo.InvariantCulture), double.Parse(results[2].Longitude, CultureInfo.InvariantCulture));
+                            // TESTING PURPOSES ONLY
+
+
+                            // TODO Add TripTiles based on 'results'
+                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, null, 20, duration));
+                        }
+                        catch (Exception) {
+                            //ignore
+                        }
                     }
                 }
             }
@@ -86,7 +126,7 @@ namespace Raven {
             public string EngineCoolantTemp { get; set; }
 
             [JsonProperty(PropertyName = "10C")]
-            public string RPM { get; set; }
+            public string Rpm { get; set; }
 
             [JsonProperty(PropertyName = "10D")]
             public string Speed { get; set; }
@@ -102,6 +142,12 @@ namespace Raven {
 
             [JsonProperty(PropertyName = "12F")]
             public string FuelLevelInput { get; set; }
+            
+            [JsonProperty(PropertyName = "lat")]
+            public string Latitude { get; set; }
+
+            [JsonProperty(PropertyName = "lng")]
+            public string Longitude { get; set; }
         }
 
         public void SqlGetByReg(string reg) {
@@ -139,7 +185,7 @@ namespace Raven {
             }
         }
 
-        private Location MidPoint(GeoCoordinate posA, GeoCoordinate posB) {
+        public Location MidPoint(GeoCoordinate posA, GeoCoordinate posB) {
             GeoCoordinate midPoint = new GeoCoordinate();
 
             double dLon = DegreeToRadian(posB.Longitude - posA.Longitude);
@@ -159,31 +205,18 @@ namespace Raven {
             return new Location(midPoint.Latitude, midPoint.Longitude);
         }
 
-        private double DegreeToRadian(double angle) {
+        public double DegreeToRadian(double angle) {
             return Math.PI * angle / 180.0;
         }
 
-        private double RadianToDegree(double angle) {
+        public double RadianToDegree(double angle) {
             return angle * (180.0 / Math.PI);
         }
 
-        private void ChangeLocations() {
-            _start.Latitude = _start.Latitude + 0.01;
-            _start.Longitude = _start.Longitude + 0.01;
-            _end.Latitude = _start.Latitude + 0.01;
-            _end.Longitude = _start.Longitude + 0.01;
-        }
-
-        private void TileBtn_OnClick(object sender, RoutedEventArgs e) {
-            _center = MidPoint(new GeoCoordinate(_start.Latitude, _start.Longitude),
-                new GeoCoordinate(_end.Latitude, _end.Longitude));
-            TripTileCollection.Add(new Tile(_start, _end, _center, 11, null, "BK79499", "22/05/2017", "12:54", 5.0,
-                15));
-            ChangeLocations();
-        }
-
         private void SearchBtn_OnClick(object sender, RoutedEventArgs e) {
-            SqlGetByReg("BE70846");
+            if (Regex.IsMatch(SearchDetailsBox.Text, "[A-z]{2}[0-9]{5}")) {
+                SqlGetByReg(SearchDetailsBox.Text);
+            }
         }
     }
 }

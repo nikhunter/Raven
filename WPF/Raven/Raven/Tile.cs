@@ -10,20 +10,20 @@ namespace Raven
     public class Tile
     {
         public Location StartLocation { get; set; }
-        public Location EndLocation { get; set; }
         public Location CenterLocation { get; set; }
+        public Location EndLocation { get; set; }
         public int ZoomLevel { get; set; }
         public MapLayer Route { get; set; }
         public string Title { get; set; }
         public string Date { get; set; }
         public string TimeStarted { get; set; }
         public double Distance { get; set; }
-        public int Duration { get; set; }
+        public string Duration { get; set; }
 
-        public Tile(Location startLocation, Location endLocation, Location center, int zoomLevel, MapLayer route, string title, string date, string timeStarted, double distance, int duration) {
+        public Tile(Location startLocation, Location center, Location endLocation, int zoomLevel, MapLayer route, string title, string date, string timeStarted, double distance, string duration) {
             StartLocation = startLocation;
-            EndLocation = endLocation;
             CenterLocation = center;
+            EndLocation = endLocation;
             ZoomLevel = zoomLevel;
             Route = route;
             Title = title;
