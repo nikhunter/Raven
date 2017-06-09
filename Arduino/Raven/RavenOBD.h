@@ -1,5 +1,6 @@
 bool hasMEMS;
 int deltaTime = 0;
+int writeInterval = 2000;
 
 long lat, lng;
 int rpm,_speed;
@@ -41,61 +42,59 @@ void testOut()
 
 void readPIDs()
 {
-    //static const byte pidlist[] = {0x0C, 0x0D};
+  static const byte pidlist[] = {PID_RPM, PID_SPEED};
+  static const String pidNames[] = {"Rpm", "Speed"};
 
-      StaticJsonBuffer<200> jsonBuffer;
-      JsonObject& json = jsonBuffer.createObject();
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  
+  int timeDiff = millis() - deltaTime;
+  json["DeltaTime"] = timeDiff - writeInterval;
 
 #if !DEBUG_MODE
-
-      json["DeltaTime"] = millis();
-
-      static const byte pidlist[] = {PID_RPM, PID_SPEED};
-
-      static const String pidNames[] = {"Rpm", "Speed"};
       
-      for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
-          byte pid = pidlist[i];
-          bool valid = obd.isValidPID(pid);
-          
-          if (valid) {
-              int value;
-              if (obd.readPID(pid, value)) {
-                //BT.print(value);
-                
-                //String pidHex = (String) ((int)pid | 0x100, HEX); 
-                json[pidNames[i]] = value;
-              }
-          }else{
-            json[pidNames[i]] = "";  
+  for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
+      byte pid = pidlist[i];
+      bool valid = obd.isValidPID(pid);
+      
+      if (valid) {
+          int value;
+          if (obd.readPID(pid, value)) {
+            //BT.print(value);
+            
+            //String pidHex = (String) ((int)pid | 0x100, HEX); 
+            json[pidNames[i]] = value;
           }
-       }
+      }else{
+        json[pidNames[i]] = "";  
+      }
+   }
 
-       json["Lat"] = ((float)lat / 100000);
-       json["Lng"] = ((float)lng / 100000);
-       json["Date"] = date;
-       json["Time"] = time;
+   json["Lat"] = ((float)lat / 100000);
+   json["Lng"] = ((float)lng / 100000);
+   json["Date"] = date;
+   json["Time"] = time;
 
-       rpm = json["Rpm"];
-       _speed = json["Speed"];
-       
 #endif
 #if DEBUG_MODE
 
-  json["timeDelta"] = 4242;
-  json["10C"] = 845;
-  json["10D"] = 68;
-  json["date"] = date;
-  json["time"] = time; 
-  json["lat"] = ((float)lat / 100000);
-  json["lng"] = ((float)lng / 100000);
+  json["Rpm"] = 845;
+  json["Speed"] = 0;
+  json["Lat"] = ((float)lat / 100000);
+  json["Lng"] = ((float)lng / 100000);
+  json["Date"] = date;
+  json["Time"] = time; 
   
 #endif
 
-  json.printTo(BT);
-  BT.println("");
-  delay(500);
-  deltaTime = millis();
+  rpm = json["Rpm"];
+  _speed = json["Speed"];
+
+  if (timeDiff > writeInterval){
+    deltaTime = millis();
+    json.printTo(BT);
+    BT.println("");
+  }
 }
 
 void processGPS(){
