@@ -5,17 +5,34 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.RequiresPermission;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Button;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +41,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,14 +55,13 @@ public class MainActivity extends Activity
     TextView rpm;
     TextView lat;
     TextView lng;
-    TextView stress;
-    TextView temp;
-    TextView throttlepos;
-    TextView petrollvl;
-
+    TextView arrayCount;
+    ToggleButton loggingToggleBtn;
+    TextView log;
     GridLayout gridLayout;
     TextView myLabel;
     EditText myTextbox;
+
     BluetoothAdapter mBluetoothAdapter;
     BluetoothSocket mmSocket;
     BluetoothDevice mmDevice;
@@ -54,6 +73,7 @@ public class MainActivity extends Activity
     int readBufferPosition;
     int counter;
 
+    JSONArray jsonArray;
 
     volatile boolean stopWorker;
     @Override
@@ -69,13 +89,127 @@ public class MainActivity extends Activity
         rpm = (TextView)findViewById(R.id.rpm);
         lat = (TextView)findViewById(R.id.lat);
         lng = (TextView)findViewById(R.id.lng);
-        stress = (TextView)findViewById(R.id.stress);
-        temp = (TextView)findViewById(R.id.temp);
-        throttlepos = (TextView)findViewById(R.id.throttlepos);
-        petrollvl = (TextView)findViewById(R.id.petrollvl);
+        loggingToggleBtn = (ToggleButton) findViewById(R.id.LoggingToggleBtn);
+        arrayCount = (TextView) findViewById(R.id.arrayCount);
+        log = (TextView)findViewById(R.id.log);
+
+
+       /* // NOT RECOMMENDED NOT FOR PROD USE ALARM ALARM
+        static final String url = "jdbc:mysql://raven-gps.com:3306/raven";
+        static final String user = "root";
+        static final String pass = "Raven123";
+        // NOT RECOMMENDED NOT FOR PROD USE ALARM ALARM*/
+
+        loggingToggleBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                switch (String.valueOf(isChecked).toUpperCase()){
+                    case "TRUE":        // ENABLED
+
+                        jsonArray = new JSONArray();
+
+                        break;
+                    case "FALSE":       // DISABLED
+                        AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                        adb.setTitle("Save File");
+
+                      /*  CharSequence[] options = {
+                                "Upload To SQL",
+                                "Do nothing",
+                                "Blah",
+                                "Blahh"
+                        };
+
+                        final boolean[] optionsBool = new boolean[options.length];
+                        adb.setSingleChoiceItems(options, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                for (int i = 0; i<optionsBool.length;i++){
+                                    if (i == which){
+                                        optionsBool[i] = true;
+                                    }else{
+                                        optionsBool[i] = false;
+                                    }
+                                }
+                            }
+                        });*/
+
+                        adb.setPositiveButton("Upload To SQL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                log.setText(jsonArray.toString());
+
+                                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                                Date date = new Date();
+/*
+                                try {
+                                    File file = new File(Environment.DIRECTORY_MUSIC + "/RavenLogs/" + dateFormat.format(date) + ".json");
+                                    FileOutputStream fileOutput = new FileOutputStream(file);
+                                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutput);
+                                    outputStreamWriter.write(jsonArray.toString());
+                                    outputStreamWriter.flush();
+                                    fileOutput.getFD().sync();
+                                    outputStreamWriter.close();
+                                }catch (Exception e){
+                                    WriteLog(e.getMessage());
+                                }
+                                /**/
+
+                                writeToFile(jsonArray.toString(), dateFormat.format(date) + ".json");
+
+                            }
+                        });
+
+                        adb.setNegativeButton("Discard", null);
+                        adb.setCancelable(false);
+                        adb.show();
+                        break;
+                }
+            }
+        });
+
 
     }
 
+    public void writeToFile(String data, String name)
+    {
+        // Get the directory for the user's public pictures directory.
+        final File path =
+                Environment.getExternalStoragePublicDirectory
+                        (
+                                //Environment.DIRECTORY_PICTURES
+                                Environment.DIRECTORY_MUSIC + "/RavenLogs/"
+                        );
+
+        // Make sure the path directory exists.
+        if(!path.exists())
+        {
+            // Make it, if it doesn't exit
+            path.mkdirs();
+            WriteLog("Path not exists");
+        }
+
+        final File file = new File(path, name);
+
+        // Save your stream, don't forget to flush() it before closing it.
+
+        try
+        {
+            file.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(file);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.append(data);
+
+            myOutWriter.close();
+
+            fOut.flush();
+            fOut.close();
+        }
+        catch (IOException e)
+        {
+            WriteLog(e.getMessage());
+        }
+    }
 
     public void CloseBTBtn_OnClick(View v){
         try
@@ -233,16 +367,18 @@ public class MainActivity extends Activity
         try {
             JSONObject j = new JSONObject(json);
 
-            SetTextFromPID(date, "date", j);
-            SetTextFromPID(time, "timeDelta", j);
-            SetTextFromPID(kmh, "10C", j);
-            SetTextFromPID(rpm, "10D", j);
-            SetTextFromPID(lat, "lat", j);
-            SetTextFromPID(lng, "lng", j);
-            SetTextFromPID(temp, "105", j);
-            SetTextFromPID(stress, "104", j);
-            SetTextFromPID(throttlepos, "111", j);
-            SetTextFromPID(petrollvl, "12F", j);
+            SetTextFromPID(time, "DeltaTime", j);
+            SetTextFromPID(rpm, "Rpm", j);
+            SetTextFromPID(kmh, "Speed", j);
+            SetTextFromPID(lat, "Lat", j);
+            SetTextFromPID(lng, "Lng", j);
+            SetTextFromPID(date, "Date", j);
+            SetTextFromPID(time, "Time", j);
+
+            if (loggingToggleBtn.isChecked()){
+                jsonArray.put(j);
+                arrayCount.setText(String.valueOf(jsonArray.length() - 1));
+            }
 
         }catch (JSONException e){
             android.util.Log.println(android.util.Log.VERBOSE,"error",e.toString());
