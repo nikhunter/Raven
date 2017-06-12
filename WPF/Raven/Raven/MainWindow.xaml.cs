@@ -8,6 +8,7 @@ using System.Device.Location;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using MySql.Data.MySqlClient;
 using Microsoft.Maps.MapControl.WPF;
 using Newtonsoft.Json;
@@ -31,8 +32,7 @@ namespace Raven {
             InitializeComponent();
 
             loginWindow.Closed += delegate {
-                if (loginWindow.LoginSuccess)
-                {
+                if (loginWindow.LoginSuccess) {
                     LoadTripTiles();
                     Show();
                 }
@@ -54,6 +54,7 @@ namespace Raven {
                 MySqlCommand command = connection.CreateCommand();
                 command.CommandText = $"SELECT * FROM trips";
 
+                // TODO Make this into a separate method
                 using (MySqlDataReader dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     foreach (DataRow row in dt.Rows) {
@@ -68,41 +69,56 @@ namespace Raven {
                             // TODO Fetch coordinates of first and last 'result'
                             List<RootObject> results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
 
+                            // TESTING PURPOSES ONLY
+                            Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
+                            Location endLocation = new Location(double.Parse(results[results.Count - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[results.Count - 1].Longitude, CultureInfo.InvariantCulture));
+                            Location centerLocation = MidPoint(new GeoCoordinate(startLocation.Latitude, startLocation.Longitude), new GeoCoordinate(endLocation.Latitude, endLocation.Longitude));
+                            // TESTING PURPOSES ONLY
+
+                            // Set ZoomLevel to fit all pins
+
+                            // Create MapLayer of driven route
+                            MapLayer polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
+                            for (var i = 1; i < results.Count; i++) {
+                                var polyLine = new MapPolyline();
+                                var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
+                                polyLine.Stroke = colourBrush;
+                                polyLine.StrokeThickness = 1;
+                                polyLine.Opacity = 1.0;
+
+                                polyLine.Locations = new LocationCollection {
+                                    new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
+                                    new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
+                                };
+                                polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
+                            }
+
                             // Format date
                             date = date.Replace('-', '/');
                             date = date.Replace(" ", " - ");
 
                             // Calculate distance // TODO Get the total distance between all pins
+                            var distance = CalculateDistance(startLocation, endLocation) / 1000; // TEMPORARILY - Bird flight distance only
                             // foreach (row in results)
                             // Find distance, add it to Total
                             // var distance = total;
 
-                            // Calculate duration // TODO Separate time from time_started/time_ended
+                            // Calculate duration
+                            // MAYBE Change to get difference between first and last index of 'results' collection
                             string duration;
                             TimeSpan difference = dateEnd - dateStart;
-                            if (difference.TotalDays >= 1)
-                            {
+                            if (difference.TotalDays >= 1) {
                                 duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
                             }
-                            else if (difference.TotalHours >= 1)
-                            {
+                            else if (difference.TotalHours >= 1) {
                                 duration = difference.Hours + "h " + difference.Minutes + "m";
                             }
-                            else
-                            {
+                            else {
                                 duration = difference.Minutes + "m";
                             }
 
-
-                            // TESTING PURPOSES ONLY
-                            Location startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
-                            Location centerLocation = new Location(double.Parse(results[1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[1].Longitude, CultureInfo.InvariantCulture));
-                            Location endLocation = new Location(double.Parse(results[2].Latitude, CultureInfo.InvariantCulture), double.Parse(results[2].Longitude, CultureInfo.InvariantCulture));
-                            // TESTING PURPOSES ONLY
-
-
-                            // TODO Add TripTiles based on 'results'
-                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, null, title, date, null, 20, duration));
+                            // Create TripTile
+                            TripTileCollection.Add(new Tile(startLocation, centerLocation, endLocation, 11, polyLineLayer, title, date, distance, duration));
                         }
                         catch (Exception) {
                             //ignore
@@ -116,37 +132,19 @@ namespace Raven {
         }
 
         public class RootObject {
-            [JsonProperty(PropertyName = "TimeDelta")]
-            public string TimeDelta { get; set; }
+            [JsonProperty(PropertyName = "DeltaTime")]
+            public string DeltaTime { get; set; }
 
-            [JsonProperty(PropertyName = "104")]
-            public string EngineLoad { get; set; }
-
-            [JsonProperty(PropertyName = "105")]
-            public string EngineCoolantTemp { get; set; }
-
-            [JsonProperty(PropertyName = "10C")]
+            [JsonProperty(PropertyName = "Rpm")]
             public string Rpm { get; set; }
 
-            [JsonProperty(PropertyName = "10D")]
+            [JsonProperty(PropertyName = "Speed")]
             public string Speed { get; set; }
 
-            [JsonProperty(PropertyName = "10E")]
-            public string TimingAdvance { get; set; }
-
-            [JsonProperty(PropertyName = "10F")]
-            public string IntakeAirTemp { get; set; }
-
-            [JsonProperty(PropertyName = "111")]
-            public string ThrottlePosition { get; set; }
-
-            [JsonProperty(PropertyName = "12F")]
-            public string FuelLevelInput { get; set; }
-            
-            [JsonProperty(PropertyName = "lat")]
+            [JsonProperty(PropertyName = "Lat")]
             public string Latitude { get; set; }
 
-            [JsonProperty(PropertyName = "lng")]
+            [JsonProperty(PropertyName = "Lng")]
             public string Longitude { get; set; }
         }
 
@@ -177,7 +175,6 @@ namespace Raven {
                 var firstCoordinate = new GeoCoordinate(previousPin.Longitude, previousPin.Latitude);
                 var secondCoordinate = new GeoCoordinate(currentPin.Longitude, currentPin.Latitude);
 
-                // Returns distance in meters
                 return firstCoordinate.GetDistanceTo(secondCoordinate);
             }
             catch (Exception) {
@@ -185,6 +182,7 @@ namespace Raven {
             }
         }
 
+        // Returns the Location in the middle of two GeoCoordinates, with an added offset for the big map pins from Bing
         public Location MidPoint(GeoCoordinate posA, GeoCoordinate posB) {
             GeoCoordinate midPoint = new GeoCoordinate();
 
@@ -197,12 +195,11 @@ namespace Raven {
                 Math.Sqrt(
                     (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) *
                     (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) + by * by)));
-            // (Math.Cos(DegreesToRadians(posA.Latitude))) + Bx) + By * By)); // Your Code
 
             midPoint.Longitude = posA.Longitude +
                                  RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
 
-            return new Location(midPoint.Latitude, midPoint.Longitude);
+            return new Location(midPoint.Latitude + 0.007, midPoint.Longitude);
         }
 
         public double DegreeToRadian(double angle) {
