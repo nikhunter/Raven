@@ -27,10 +27,10 @@
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/gridLayout"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/open"
-        android:id="@+id/gridLayout">
+        android:layout_above="@+id/scrollView2">
 
         <TextView
             android:layout_width="200px"
@@ -63,40 +63,6 @@
             android:layout_column="0"
             android:layout_row="4"
             android:text="Latitude" />
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="5"
-            android:text="Longitude" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="6"
-            android:text="Stress" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="7"
-            android:text="Temp" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="8"
-            android:text="Throttle Pos" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="9"
-            android:text="Petrol Level" />
 
         <TextView
             android:layout_width="200px"
@@ -135,46 +101,6 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_row="4"
-            android:text="-"
-            android:textAlignment="center" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="5"
-            android:text="-"
-            android:textAlignment="center" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="6"
-            android:text="-"
-            android:textAlignment="center" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="7"
-            android:text="-"
-            android:textAlignment="center" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="8"
-            android:text="-"
-            android:textAlignment="center" />
-
-        <TextView
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="9"
             android:text="-"
             android:textAlignment="center" />
 
@@ -222,39 +148,57 @@
             android:layout_height="wrap_content"
             android:layout_column="2"
             android:layout_row="5" />
+
         <TextView
-            android:id="@+id/stress"
+            android:id="@+id/textView"
             android:layout_width="200px"
             android:layout_height="wrap_content"
-            android:layout_column="2"
-            android:layout_row="6" />
+            android:layout_column="0"
+            android:layout_row="5"
+            android:text="Longitude" />
+
         <TextView
-            android:id="@+id/temp"
-            android:layout_width="200px"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="2"
-            android:layout_row="7" />
+            android:layout_column="0"
+            android:layout_row="7"
+            android:text="Lines In Array: " />
+
         <TextView
-            android:id="@+id/throttlepos"
-            android:layout_width="200px"
+            android:id="@+id/arrayCount"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="2"
-            android:layout_row="8" />
-        <TextView
-            android:id="@+id/petrollvl"
-            android:layout_width="200px"
-            android:layout_height="wrap_content"
-            android:layout_column="2"
-            android:layout_row="9" />
+            android:layout_column="1"
+            android:layout_row="7"
+            android:text="" />
     </GridLayout>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
+    <ToggleButton
+        android:id="@+id/LoggingToggleBtn"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="49dp"
-        android:text="Button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/close"
+        android:text="ToggleButton"
+        android:textOff="Logging Disabled"
+        android:textOn="Logging Enabled" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView2"
+        android:layout_above="@+id/open"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:id="@+id/log"
+            android:layout_width="match_parent"
+            android:minLines="5"
+            android:maxLines="19"
+            android:layout_height="wrap_content"/>
+
+    </ScrollView>
+
 
 </RelativeLayout>
