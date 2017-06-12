@@ -10,6 +10,8 @@
 #include "RavenOBD.h"
 #include "images.h"
 
+int dTime = 0;
+
 void setup() {
   // put your setup code here, to run once:
   lcd.begin();
@@ -29,14 +31,16 @@ void setup() {
   lcd.println(hasMEMS ? "Yes" : "No");
 
 #if !DEBUG_MODE
+
   // send some commands for testing and show response for debugging purpose
-  testOut();
+  //testOut();
 
   // initialize OBD-II adapter
   while(!obd.init()) {
     lcd.setCursor(0,0);
     lcd.println("Standby for OBD Connection");
   }
+
 #endif
 
   char buf[64];
@@ -69,24 +73,34 @@ void setup() {
 }
 
 void loop() {
-  readPIDs();
   processGPS();
-  lcd.setCursor(0,2);
-  lcd.print("lat: ");
-  lcd.print((float)lat / 100000, 5);
-  lcd.setCursor(0,4);
-  lcd.print("lng: ");
-  lcd.print((float)lng / 100000, 5);
-  lcd.setCursor(0,6);
-  lcd.print("date: ");
-  lcd.print(date);
-  lcd.setCursor(0,8);
-  lcd.print("time: ");
-  lcd.print(time);
-  lcd.setCursor(0,10);
-  lcd.print("RPM: ");
-  lcd.print(rpm);
-  lcd.setCursor(0,12);
-  lcd.print("Speed: ");
-  lcd.print(_speed);  
+  
+  int timeDiff = millis() - dTime;
+  if (timeDiff > 1000){
+    dTime = millis();
+
+    #if DEBUG_MODE
+      rpm = rpm + 1;
+    #endif
+    
+    readPIDs();
+    lcd.setCursor(0,2);
+    lcd.print("lat: ");
+    lcd.print((float)lat / 100000, 5);
+    lcd.setCursor(0,4);
+    lcd.print("lng: ");
+    lcd.print((float)lng / 100000, 5);
+    lcd.setCursor(0,6);
+    lcd.print("date: ");
+    lcd.print(date);
+    lcd.setCursor(0,8);
+    lcd.print("time: ");
+    lcd.print(time);
+    lcd.setCursor(0,10);
+    lcd.print("RPM: ");
+    lcd.print(rpm);
+    lcd.setCursor(0,12);
+    lcd.print("Speed: ");
+    lcd.print(_speed);
+  }
 }

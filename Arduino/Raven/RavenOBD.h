@@ -1,12 +1,16 @@
 bool hasMEMS;
 int deltaTime = 0;
 int writeInterval = 2000;
-
-long lat, lng;
-int rpm,_speed;
-unsigned long fix_age, time, date, speed, course;
+   
+uint32_t time;
+uint32_t date;
+int32_t lat, lng;
+int32_t rpm,_speed;
 unsigned long chars;
 unsigned short sentences, failed_checksum;
+
+static const byte pidlist[] = {PID_RPM, PID_SPEED};
+static const String pidNames[] = {"Rpm", "Speed"};
 
 void testOut()
 {
@@ -33,64 +37,56 @@ void testOut()
         } else {
             lcd.println("Timeout");
         }
-        delay(1000);
+        delay(250);
     }
     lcd.println();
-    delay(5000);
+    delay(2500);
     lcd.clear();
 }
 
-void readPIDs()
-{
-  static const byte pidlist[] = {PID_RPM, PID_SPEED};
-  static const String pidNames[] = {"Rpm", "Speed"};
-
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
-  
+void readPIDs(){
   int timeDiff = millis() - deltaTime;
-  json["DeltaTime"] = timeDiff - writeInterval;
+  if (timeDiff > writeInterval){
+    StaticJsonBuffer<120> jsonBuffer;
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["DeltaTime"] = timeDiff - writeInterval;
 
 #if !DEBUG_MODE
-      
-  for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
-      byte pid = pidlist[i];
-      bool valid = obd.isValidPID(pid);
-      
-      if (valid) {
-          int value;
-          if (obd.readPID(pid, value)) {
-            //BT.print(value);
-            
-            //String pidHex = (String) ((int)pid | 0x100, HEX); 
-            json[pidNames[i]] = value;
-          }
-      }else{
-        json[pidNames[i]] = "";  
-      }
-   }
 
-   json["Lat"] = ((float)lat / 100000);
-   json["Lng"] = ((float)lng / 100000);
-   json["Date"] = date;
-   json["Time"] = time;
+    for (byte i = 0; i < sizeof(pidlist) / sizeof(pidlist[0]); i++) {
+        byte pid = pidlist[i];
+        bool valid = obd.isValidPID(pid);
+        
+        if (valid) {
+            int value;
+            if (obd.readPID(pid, value)) {
+              json[pidNames[i]] = value;
+            }
+        }else{
+          json[pidNames[i]] = "";  
+        }
+     }
+  
+     json["Lat"] = ((float)lat / 100000);
+     json["Lng"] = ((float)lng / 100000);
+     json["Date"] = date;
+     json["Time"] = time;
 
+     rpm = json["Rpm"];
+     _speed = json["Speed"];
 #endif
 #if DEBUG_MODE
 
-  json["Rpm"] = 845;
-  json["Speed"] = 0;
-  json["Lat"] = ((float)lat / 100000);
-  json["Lng"] = ((float)lng / 100000);
-  json["Date"] = date;
-  json["Time"] = time; 
+    json["Rpm"] = 800;
+    json["Speed"] = 20;
+    json["Lat"] = ((float)lat / 100000);
+    json["Lng"] = ((float)lng / 100000);
+    json["Date"] = date;
+    json["Time"] = time; 
   
 #endif
 
-  rpm = json["Rpm"];
-  _speed = json["Speed"];
-
-  if (timeDiff > writeInterval){
     deltaTime = millis();
     json.printTo(BT);
     BT.println("");
@@ -99,21 +95,18 @@ void readPIDs()
 
 void processGPS(){
    while (GPS.available()){
-      int c = GPS.read();
-      if (gps.encode(c)){         
+      char c = GPS.read();
+      
+      if (gps.encode(c)){
         // retrieves +/- lat/long in 100000ths of a degree
-        gps.get_position(&lat, &lng, &fix_age);
-         
+        gps.get_position(&lat, &lng, 0);
+           
         // time in hhmmsscc, date in ddmmyy
-        gps.get_datetime(&date, &time, &fix_age);
-         
-        // returns speed in 100ths of a knot
-        speed = gps.speed();
-         
-        // course in 100ths of a degree
-        course = gps.course();
-        
+        gps.get_datetime(&date, &time, 0);
       }
+
+      #if DEBUG_MODE
+        _speed = _speed + 1;
+      #endif
    }
 }
-
