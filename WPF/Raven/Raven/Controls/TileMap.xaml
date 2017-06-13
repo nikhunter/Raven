@@ -6,6 +6,7 @@
              xmlns:wpf="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
              xmlns:local="clr-namespace:Raven"
              xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
+             xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
              mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -29,7 +30,7 @@
 
     <Grid>
         <!--Map-->
-        <wpf:Map x:Name="TripTileMap" IsEnabled="False" Mode="Road" ZoomLevel="0" Height="Auto" Width="Auto"
+        <wpf:Map x:Name="TripTileMap" IsEnabled="True" Mode="Road" ZoomLevel="0" Height="Auto" Width="Auto"
                  MapForegroundStyle="{StaticResource MapForegroundStyle}">
             <wpf:Map.CredentialsProvider>
                 <wpf:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>

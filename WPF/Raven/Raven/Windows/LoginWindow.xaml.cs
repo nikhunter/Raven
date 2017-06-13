@@ -1,27 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Interop;
 using MySql.Data.MySqlClient;
 
 namespace Raven.Windows {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml
     /// </summary>
-    public partial class LoginWindow : Window {
+    public partial class LoginWindow {
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
         public bool LoginSuccess;
 
@@ -39,7 +31,7 @@ namespace Raven.Windows {
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             SetWindowLong(hwnd, GwlStyle,
                 GetWindowLong(hwnd, GwlStyle) & (0xFFFFFFFF ^ WsSysmenu));
-
+            
             base.OnSourceInitialized(e);
         }
 
@@ -131,6 +123,7 @@ namespace Raven.Windows {
                 case Key.Enter:
                     if (Keyboard.IsKeyDown(Key.RightShift)) {
                         LoginSuccess = true;
+                        MainWindow.Username = "DebugUser";
                         Close();
                     }
                     else {
