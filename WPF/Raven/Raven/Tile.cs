@@ -1,9 +1,7 @@
 ﻿using Microsoft.Maps.MapControl.WPF;
 
-namespace Raven
-{
-    public class Tile
-    {
+namespace Raven {
+    public class Tile {
         public Location StartLocation { get; set; }
         public Location EndLocation { get; set; }
         public LocationRect Bounds { get; set; }

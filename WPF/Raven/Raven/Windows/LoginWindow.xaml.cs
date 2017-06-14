@@ -18,20 +18,20 @@ namespace Raven.Windows {
         public bool LoginSuccess;
 
         [DllImport("user32.dll")]
-        static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+        public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
-        static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
         private const int GwlStyle = -16;
 
         private const uint WsSysmenu = 0x80000;
 
         protected override void OnSourceInitialized(EventArgs e) {
-            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            var hwnd = new WindowInteropHelper(this).Handle;
             SetWindowLong(hwnd, GwlStyle,
                 GetWindowLong(hwnd, GwlStyle) & (0xFFFFFFFF ^ WsSysmenu));
-            
+
             base.OnSourceInitialized(e);
         }
 
@@ -47,6 +47,7 @@ namespace Raven.Windows {
             // If login is corrrect changes LoginSuccess to true and closes LoginWindow
             if (AuthenticateLogin(UsernameText.Text.ToLower(), PasswordText.Password)) {
                 LoginSuccess = true;
+                MainWindow.Username = UsernameText.Text.ToLower();
                 Close();
             }
             // If username or password is incorrect show error
@@ -59,15 +60,15 @@ namespace Raven.Windows {
             // Stores hash value of password in hash
             var hash = GetHash(password);
 
-            MySqlConnection connection = new MySqlConnection(ConnectionString);
-            DataTable dt = new DataTable();
+            var connection = new MySqlConnection(ConnectionString);
+            var dt = new DataTable();
             connection.Open();
 
             try {
-                MySqlCommand command = connection.CreateCommand();
+                var command = connection.CreateCommand();
                 command.CommandText = $"SELECT * FROM logins";
 
-                using (MySqlDataReader dr = command.ExecuteReader()) {
+                using (var dr = command.ExecuteReader()) {
                     dt.Load(dr);
 
                     // Returns true using LINQ expression
@@ -84,22 +85,21 @@ namespace Raven.Windows {
         }
 
         public static string GetHash(string inputString) {
-            SHA512 sha512 = SHA512.Create();
-            byte[] bytes = Encoding.UTF8.GetBytes(inputString);
-            byte[] hash = sha512.ComputeHash(bytes);
+            var sha512 = SHA512.Create();
+            var bytes = Encoding.UTF8.GetBytes(inputString);
+            var hash = sha512.ComputeHash(bytes);
             return GetStringFromHash(hash);
         }
 
         private static string GetStringFromHash(byte[] hash) {
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++) {
-                result.Append(hash[i].ToString("X2"));
+            var result = new StringBuilder();
+            foreach (var t in hash) {
+                result.Append(t.ToString("X2"));
             }
             return result.ToString();
         }
 
-        private void UsernameText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
+        private void UsernameText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (string.IsNullOrEmpty(UsernameText.Text)) {
                 UsernameText.Text = null;
             }
@@ -112,8 +112,7 @@ namespace Raven.Windows {
         }
 
         private void PasswordText_LostGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
-            if (PasswordText.Password == "")
-            {
+            if (PasswordText.Password == "") {
                 PasswordText.Password = "PPPPPPPP";
             }
         }

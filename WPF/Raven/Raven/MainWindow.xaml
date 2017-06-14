@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:local="clr-namespace:Raven"
-        xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
-        xmlns:controls="clr-namespace:Raven.Controls"
-        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        xmlns:controls="clr-namespace:Raven.Controls" MouseRightButtonUp="RavenMainWindow_OnMouseRightButtonUp"
+        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}" x:Name="RavenMainWindow"
         Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
     <Window.Resources>
@@ -73,82 +72,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Map Styles -->
-        <Style x:Key="MapForegroundStyle" TargetType="{x:Type overlays:MapForeground}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type overlays:MapForeground}">
-                        <TextBlock Text="© 2017 Microsoft Corporation"
-                                   Foreground="Gray"
-                                   FontSize="7"
-                                   VerticalAlignment="Bottom"
-                                   HorizontalAlignment="Right"
-                                   Margin="0,0,1,1" />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="PushPinToolTipStyle" TargetType="ToolTip">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Border CornerRadius="5" BorderBrush="Black" BorderThickness="2" Background="#5c87b2">
-                            <ContentPresenter Margin="5">
-                                <ContentPresenter.Content>
-                                    <Grid Margin="5">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0"
-                                                    Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                            <TextBlock Text="{Binding Date}" Foreground="White" FontWeight="Bold"
-                                                       FontSize="16" />
-                                            <TextBlock Text=" - " Foreground="White" FontWeight="Bold" FontSize="16" />
-                                            <TextBlock Text="{Binding Time}" Foreground="White" FontWeight="Bold"
-                                                       FontSize="16" />
-                                        </StackPanel>
-
-                                        <TextBlock Text="Speed:&#x09;" Grid.Row="1" Grid.Column="0" Foreground="White"
-                                                   HorizontalAlignment="Left" />
-                                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1"
-                                                    HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Speed}" Foreground="White" />
-                                            <TextBlock Text=" Km/t" Foreground="White" />
-                                        </StackPanel>
-
-                                        <TextBlock Text="RPM:&#x09;" Grid.Row="2" Grid.Column="0" Foreground="White"
-                                                   HorizontalAlignment="Left" />
-                                        <TextBlock Text="{Binding Rpm}" Grid.Row="2" Grid.Column="1" Foreground="White"
-                                                   HorizontalAlignment="Left" />
-
-                                        <TextBlock Text="Latitude:&#x09;" Grid.Row="3" Grid.Column="0"
-                                                   Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBlock Text="{Binding Location.Latitude}" Grid.Row="3" Grid.Column="1"
-                                                   Foreground="White" />
-
-                                        <TextBlock Text="Longitude:&#x09;" Grid.Row="4" Grid.Column="0"
-                                                   Foreground="White" HorizontalAlignment="Left" />
-                                        <TextBlock Text="{Binding Location.Longitude}" Grid.Row="4" Grid.Column="1"
-                                                   Foreground="White" />
-                                    </Grid>
-                                </ContentPresenter.Content>
-                            </ContentPresenter>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <!-- ItemControl Styles -->
         <Style TargetType="ContentPresenter" x:Key="TripTileContainerStyle">
             <Setter Property="Opacity" Value="1.0" />
@@ -157,7 +80,7 @@
                     <Setter Property="Opacity" Value="1.0" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="False">
-                    <Setter Property="Opacity" Value="0.9" />
+                    <Setter Property="Opacity" Value="0.85" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -187,7 +110,7 @@
 
         <!-- TripTile Section -->
         <ScrollViewer x:Name="TileScrollView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <ItemsControl x:Name="Dong" ItemsSource="{Binding TripTileCollection}" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10" HorizontalAlignment="Center">
+            <ItemsControl x:Name="TripItemsControl" ItemsSource="{Binding TripTileCollection}" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10" HorizontalAlignment="Center" MouseLeftButtonUp="TripItemsControl_OnMouseLeftButtonUp">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
@@ -195,16 +118,16 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border CornerRadius="9" BorderBrush="Gray" BorderThickness="3" Margin="10" Width="256"
-                                    Height="156" Cursor="Hand">
+                        <Border CornerRadius="9" BorderBrush="Gray" BorderThickness="3" Margin="10" Width="276"
+                                    Height="176" Cursor="Hand">
                             <!--<Border.Effect>
                                 <DropShadowEffect Opacity="0.5"/>
                             </Border.Effect>-->
                             <Border CornerRadius="9">
                                 <Border.Clip>
-                                    <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,251,151" />
+                                    <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,271,171" />
                                 </Border.Clip>
-                                <Grid x:Name="TileGrid" Width="250" Height="150" Background="White" HorizontalAlignment="Stretch">
+                                <Grid x:Name="TileGrid" Width="270" Height="170" Background="White" HorizontalAlignment="Stretch">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -232,8 +155,11 @@
                                     <TextBlock Grid.Row="1" Text="{Binding Path=Duration}" Grid.Column="1" Margin="0,0,8,0"
                                                    HorizontalAlignment="Right" VerticalAlignment="Top"/>
 
-                                    <!--Map-->
-                                    <controls:TileMap Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0"/>
+                                    <!-- Map -->
+                                    <controls:TileMap x:Name="TileMap" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0">
+                                        <!--<m:Pushpin Background="Green" Location="{Binding Path=StartLocation}"/>
+                                        <m:Pushpin Background="Red" Location="{Binding Path=EndLocation}"/>-->
+                                    </controls:TileMap>
                                 </Grid>
                             </Border>
                         </Border>

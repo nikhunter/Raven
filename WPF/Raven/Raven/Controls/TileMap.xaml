@@ -1,18 +1,19 @@
-﻿<UserControl x:Class="Raven.Controls.TileMap"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:wpf="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-             xmlns:local="clr-namespace:Raven"
-             xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
-             xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-             mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="300" d:DesignWidth="300">
+﻿<m:Map x:Class="Raven.Controls.TileMap"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:local="clr-namespace:Raven"
+       xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
+       xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+       mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+       Name="TripTileMap" Loaded="TileMap_OnLoaded"
+       IsEnabled="False" Mode="Road"  Height="Auto" Width="Auto"
+       >
 
-    <UserControl.Resources>
+    <m:Map.MapForegroundStyle>
         <!-- Map Style -->
-        <Style x:Key="MapForegroundStyle" TargetType="{x:Type overlays:MapForeground}">
+        <Style TargetType="{x:Type overlays:MapForeground}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type overlays:MapForeground}">
@@ -26,15 +27,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>
+    </m:Map.MapForegroundStyle>
 
-    <Grid>
-        <!--Map-->
-        <wpf:Map x:Name="TripTileMap" IsEnabled="True" Mode="Road" ZoomLevel="0" Height="Auto" Width="Auto"
-                 MapForegroundStyle="{StaticResource MapForegroundStyle}">
-            <wpf:Map.CredentialsProvider>
-                <wpf:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>
-            </wpf:Map.CredentialsProvider>
-        </wpf:Map>
-    </Grid>
-</UserControl>
+    <m:MapLayer x:Name="DrivenRoute"/>
+    <m:Pushpin x:Name="StartPin" Background="Green"/>
+    <m:Pushpin x:Name="EndPin" Background="Red"/>
+
+    <m:Map.CredentialsProvider>
+        <m:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>
+    </m:Map.CredentialsProvider>
+</m:Map>

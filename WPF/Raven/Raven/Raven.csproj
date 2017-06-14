@@ -161,5 +161,9 @@
   <ItemGroup>
     <Resource Include="Resources\TransparentIcon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\BluePin.png" />
+    <Resource Include="Resources\Pushpin.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

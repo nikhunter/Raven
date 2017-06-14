@@ -94,7 +94,7 @@ namespace Raven {
                                     mostWest = lng;
                                 }
                             }
-                            var bounds = new LocationRect(new Location(mostNorth + 0.002, mostWest + 0.002), new Location(mostSouth - 0.002, mostEast - 0.002));
+                            var bounds = new LocationRect(new Location(mostNorth + 0.015, mostWest + 0.0075), new Location(mostSouth - 0.002, mostEast - 0.0075));
 
                             // Set start and end locations
                             var startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
@@ -242,6 +242,22 @@ namespace Raven {
             if (Regex.IsMatch(SearchDetailsBox.Text, "[A-z]{2}[0-9]{5}")) {
                 SqlGetByReg(SearchDetailsBox.Text);
             }
+            else if (SearchDetailsBox.Text == String.Empty) {
+                TripTileCollection.Clear();
+                LoadTripTiles();
+            }
+        }
+
+        private void TripItemsControl_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TileGrid.Visibility = Visibility.Collapsed;
+            RavenMainWindow.WindowState = WindowState.Maximized;
+        }
+
+        private void RavenMainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
+
+            TileGrid.Visibility = Visibility.Visible;
+            RavenMainWindow.WindowState = WindowState.Normal;
         }
     }
 }

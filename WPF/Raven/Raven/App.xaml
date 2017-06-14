@@ -2,8 +2,84 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Raven"
+             xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- Map Style -->
+        <Style x:Key="MapForegroundStyle" TargetType="{x:Type overlays:MapForeground}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type overlays:MapForeground}">
+                        <TextBlock Text="© 2017 Microsoft Corporation"
+                                   Foreground="Gray"
+                                   FontSize="7"
+                                   VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,1,1" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--<Style x:Key="PushPinToolTipStyle" TargetType="ToolTip">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border CornerRadius="5" BorderBrush="Black" BorderThickness="2" Background="#5c87b2">
+                            <ContentPresenter Margin="5">
+                                <ContentPresenter.Content>
+                                    <Grid Margin="5">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0"
+                                                    Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                            <TextBlock Text="{Binding Date}" Foreground="White" FontWeight="Bold"
+                                                       FontSize="16" />
+                                            <TextBlock Text=" - " Foreground="White" FontWeight="Bold" FontSize="16" />
+                                            <TextBlock Text="{Binding Time}" Foreground="White" FontWeight="Bold"
+                                                       FontSize="16" />
+                                        </StackPanel>
+
+                                        <TextBlock Text="Speed:&#x09;" Grid.Row="1" Grid.Column="0" Foreground="White"
+                                                   HorizontalAlignment="Left" />
+                                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1"
+                                                    HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding Speed}" Foreground="White" />
+                                            <TextBlock Text=" Km/t" Foreground="White" />
+                                        </StackPanel>
+
+                                        <TextBlock Text="RPM:&#x09;" Grid.Row="2" Grid.Column="0" Foreground="White"
+                                                   HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Rpm}" Grid.Row="2" Grid.Column="1" Foreground="White"
+                                                   HorizontalAlignment="Left" />
+
+                                        <TextBlock Text="Latitude:&#x09;" Grid.Row="3" Grid.Column="0"
+                                                   Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Location.Latitude}" Grid.Row="3" Grid.Column="1"
+                                                   Foreground="White" />
+
+                                        <TextBlock Text="Longitude:&#x09;" Grid.Row="4" Grid.Column="0"
+                                                   Foreground="White" HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding Location.Longitude}" Grid.Row="4" Grid.Column="1"
+                                                   Foreground="White" />
+                                    </Grid>
+                                </ContentPresenter.Content>
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
     </Application.Resources>
 </Application>
