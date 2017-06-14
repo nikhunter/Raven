@@ -7,48 +7,34 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Path;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.RequiresPermission;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.EditText;
-import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import android.app.Activity;
-import android.content.Context;
-import android.os.AsyncTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Set;
 import java.util.UUID;
 
@@ -77,6 +63,9 @@ public class MainActivity extends Activity {
 	int readBufferPosition;
 	int counter;
 
+	String username;
+	Bundle extras;
+
 	JSONArray jsonArray;
 
 	volatile boolean stopWorker;
@@ -87,6 +76,10 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		gridLayout = (GridLayout) findViewById(R.id.gridLayout);
 
+		extras = getIntent().getExtras();
+		username = extras.getString("username");
+		WriteLog("AUTHUSER: " + username);
+
 		date = (TextView) findViewById(R.id.date);
 		time = (TextView) findViewById(R.id.time);
 		kmh = (TextView) findViewById(R.id.kmh);
@@ -96,6 +89,7 @@ public class MainActivity extends Activity {
 		loggingToggleBtn = (ToggleButton) findViewById(R.id.LoggingToggleBtn);
 		arrayCount = (TextView) findViewById(R.id.arrayCount);
 		log = (TextView) findViewById(R.id.log);
+
 
 
        /* // NOT RECOMMENDED NOT FOR PROD USE ALARM ALARM
@@ -109,11 +103,12 @@ public class MainActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				switch (String.valueOf(isChecked).toUpperCase()) {
 					case "TRUE":        // ENABLED
-
+						getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 						jsonArray = new JSONArray();
 
 						break;
 					case "FALSE":       // DISABLED
+						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 						AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
 						adb.setTitle("Save File");
 
@@ -143,10 +138,18 @@ public class MainActivity extends Activity {
 							public void onClick(DialogInterface dialog, int which) {
 								log.setText(jsonArray.toString());
 
+								new RavenAPI_LogTrip(
+										"06/8/2017-15:13:03",
+										"06/8/2017-15:42:18",
+										username,
+										"BK79499",
+										jsonArray.toString()
+								).execute();
+								/*
 								DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH-mm-ss");
 								Date date = new Date();
 								writeToFile(jsonArray.toString(), dateFormat.format(date) + ".json");
-
+								*/
 							}
 						});
 
@@ -362,4 +365,65 @@ public class MainActivity extends Activity {
 		mmSocket.close();
 		WriteLog("Bluetooth Closed");
 	}
+
+	class RavenAPI_LogTrip extends AsyncTask<Void, Void, String> {
+
+		private Exception exception;
+		private String API_URL = "http://raven-gps.com/insert.php";
+		private String time_started;
+		private String time_ended;
+		private String driver_username;
+		private String driver_reg;
+		private String log_file;
+
+		RavenAPI_LogTrip(String time_started, String time_ended, String driver_username, String driver_reg, String log_file){
+
+			this.time_started = time_started;
+			this.time_ended = time_ended;
+			this.driver_username = driver_username;
+			this.driver_reg = driver_reg;
+			this.log_file = log_file;
+		}
+
+		protected void onPreExecute() {
+
+		}
+
+		protected String doInBackground(Void... urls) {
+
+			try {
+				URL url = new URL(API_URL +
+						"?time_started=" + time_started +
+						"&time_ended=" + time_ended +
+						"&driver_username=" + driver_username +
+						"&driver_reg=" + driver_reg +
+						"&log_file=" + log_file);
+				HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+				urlConnection.setRequestMethod("GET");
+				try {
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+					StringBuilder stringBuilder = new StringBuilder();
+					String line;
+					while ((line = bufferedReader.readLine()) != null) {
+						stringBuilder.append(line).append("\n");
+					}
+					bufferedReader.close();
+					return stringBuilder.toString();
+				}
+				finally{
+					urlConnection.disconnect();
+				}
+			}
+			catch(Exception e) {
+				android.util.Log.e("ERROR", e.getMessage(), e);
+				return null;
+			}
+		}
+
+		protected void onPostExecute(String response) {
+			android.util.Log.e("INFO", response);
+			Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+		}
+	}
+
 }
