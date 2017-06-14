@@ -3,12 +3,11 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-       xmlns:local="clr-namespace:Raven"
        xmlns:overlays="clr-namespace:Microsoft.Maps.MapControl.WPF.Overlays;assembly=Microsoft.Maps.MapControl.WPF"
        xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-       mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+       mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
        Name="TripTileMap" Loaded="TileMap_OnLoaded"
-       IsEnabled="False" Mode="Road"  Height="Auto" Width="Auto"
+       IsEnabled="False" Mode="Road" Height="Auto" Width="Auto"
        >
 
     <m:Map.MapForegroundStyle>
@@ -29,9 +28,9 @@
         </Style>
     </m:Map.MapForegroundStyle>
 
-    <m:MapLayer x:Name="DrivenRoute"/>
+    <!--<m:MapLayer x:Name="DrivenRoute"/>
     <m:Pushpin x:Name="StartPin" Background="Green"/>
-    <m:Pushpin x:Name="EndPin" Background="Red"/>
+    <m:Pushpin x:Name="EndPin" Background="Red"/>-->
 
     <m:Map.CredentialsProvider>
         <m:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>

@@ -156,10 +156,7 @@
                                                    HorizontalAlignment="Right" VerticalAlignment="Top"/>
 
                                     <!-- Map -->
-                                    <controls:TileMap x:Name="TileMap" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0">
-                                        <!--<m:Pushpin Background="Green" Location="{Binding Path=StartLocation}"/>
-                                        <m:Pushpin Background="Red" Location="{Binding Path=EndLocation}"/>-->
-                                    </controls:TileMap>
+                                    <controls:TileMap x:Name="TileMap" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0"/>
                                 </Grid>
                             </Border>
                         </Border>

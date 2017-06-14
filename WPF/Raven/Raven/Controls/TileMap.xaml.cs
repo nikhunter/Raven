@@ -11,10 +11,10 @@ namespace Raven.Controls {
     /// Interaction logic for TileMap.xaml
     /// </summary>
     public partial class TileMap : Map {
-        public Location StartLocation { get; set; }
-        public Location EndLocation { get; set; }
-        public LocationRect Bounds { get; set; }
-        public MapLayer Route { get; set; }
+        //public Location StartLocation { get; set; }
+        //public Location EndLocation { get; set; }
+        //public LocationRect Bounds { get; set; }
+        //public MapLayer Route { get; set; }
 
         public TileMap() {
             InitializeComponent();
@@ -22,9 +22,16 @@ namespace Raven.Controls {
 
         private void TileMap_OnLoaded(object sender, RoutedEventArgs e) {
             //Children.Add(Route);
-            StartPin.Location = StartLocation;
-            EndPin.Location = EndLocation;
-            //SetView(Bounds);
+            //StartPin.Location = StartLocation;
+            //EndPin.Location = EndLocation;
+
+            var startLocation = new Pushpin { Background = Brushes.Green, Location = ((Tile)DataContext).StartLocation };
+            var endLocation = new Pushpin { Background = Brushes.Red, Location = ((Tile)DataContext).EndLocation };
+
+            Children.Add(((Tile)DataContext).Route);
+            Children.Add(startLocation);
+            Children.Add(endLocation);
+            SetView(((Tile)DataContext).Bounds);
         }
     }
 }

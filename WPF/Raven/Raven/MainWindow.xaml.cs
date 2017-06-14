@@ -242,7 +242,7 @@ namespace Raven {
             if (Regex.IsMatch(SearchDetailsBox.Text, "[A-z]{2}[0-9]{5}")) {
                 SqlGetByReg(SearchDetailsBox.Text);
             }
-            else if (SearchDetailsBox.Text == String.Empty) {
+            else if (SearchDetailsBox.Text == string.Empty) {
                 TripTileCollection.Clear();
                 LoadTripTiles();
             }
