@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-        xmlns:local="clr-namespace:Raven"
         xmlns:controls="clr-namespace:Raven.Controls" MouseRightButtonUp="RavenMainWindow_OnMouseRightButtonUp"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}" x:Name="RavenMainWindow"
-        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
+        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT"
+        >
 
     <Window.Resources>
         <!-- TextBox Filters -->
@@ -15,7 +15,7 @@
             <Style.Resources>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="VIN / REG / Username / Alias" Foreground="Gray" />
+                        <Label Content="REG / Username" Foreground="Gray" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -86,7 +86,8 @@
         </Style>
     </Window.Resources>
 
-    <Grid x:Name="TileGrid">
+    <Grid x:Name="MainGrid">
+        <Grid x:Name="TripTileGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -165,5 +166,24 @@
             </ItemsControl>
         </ScrollViewer>
 
+        </Grid>
+        
+        <Grid x:Name="RouteViewerGrid" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <m:Map x:Name="RouteViewerMap" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                <m:Pushpin x:Name="StartLocationPin" Location="55.73193, 12.34341" Background="Green" Cursor="Hand"/>
+                <m:Pushpin x:Name="EndLocationPin" Location="55.758011, 12.39254" Background="Red" Cursor="Hand"/>
+                
+                <m:Map.CredentialsProvider>
+                    <m:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>
+                </m:Map.CredentialsProvider>
+            </m:Map>
+        </Grid>
     </Grid>
 </Window>

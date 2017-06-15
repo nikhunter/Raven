@@ -2,6 +2,7 @@
 
 namespace Raven {
     public class Tile {
+        public int RowID { get; set; }
         public Location StartLocation { get; set; }
         public Location EndLocation { get; set; }
         public LocationRect Bounds { get; set; }
@@ -11,7 +12,8 @@ namespace Raven {
         public double Distance { get; set; }
         public string Duration { get; set; }
 
-        public Tile(Location startLocation, Location endLocation, LocationRect bounds, MapLayer route, string title, string date, double distance, string duration) {
+        public Tile(int rowId, Location startLocation, Location endLocation, LocationRect bounds, MapLayer route, string title, string date, double distance, string duration) {
+            RowID = rowId;
             StartLocation = startLocation;
             EndLocation = endLocation;
             Bounds = bounds;

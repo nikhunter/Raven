@@ -35,7 +35,12 @@ namespace Raven {
             loginWindow.Closed += delegate {
                 if (loginWindow.LoginSuccess) {
                     Title = $"Raven - Logged in as {Username}";
-                    LoadTripTiles();
+                    if (Username == "DebugUser") {
+                        LoadTripTiles();
+                    }
+                    else {
+                        LoadTripTiles(Username);
+                    }
                     Show();
                 }
                 else {
@@ -59,102 +64,134 @@ namespace Raven {
                 // TODO Make this into a separate method
                 using (var dr = command.ExecuteReader()) {
                     dt.Load(dr);
-                    foreach (DataRow row in dt.Rows) {
-                        try {
-                            // TODO Convert row data to RootObject for Tile creation
-                            var logs = row["log_file"].ToString();
-                            var title = row["driver_reg"].ToString();
-                            var date = row["time_started"].ToString();
-                            var dateStart = DateTime.Parse(row["time_started"].ToString());
-                            var dateEnd = DateTime.Parse(row["time_ended"].ToString());
-
-                            // TODO Fetch coordinates of first and last 'result'
-                            var results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
-
-                            // Set Bounds to fit all pins
-                            var mostNorth = double.Parse(results[0].Latitude, CultureInfo.InvariantCulture);
-                            var mostSouth = double.Parse(results[0].Latitude, CultureInfo.InvariantCulture);
-                            var mostEast = double.Parse(results[0].Longitude, CultureInfo.InvariantCulture);
-                            var mostWest = double.Parse(results[0].Longitude, CultureInfo.InvariantCulture);
-
-                            for (var i = 1; i < results.Count; i++) {
-                                var lat = double.Parse(results[i].Latitude, CultureInfo.InvariantCulture);
-                                var lng = double.Parse(results[i].Longitude, CultureInfo.InvariantCulture);
-
-                                if (lat > mostNorth) {
-                                    mostNorth = lat;
-                                }
-                                else if (lat < mostSouth) {
-                                    mostSouth = lat;
-                                }
-                                if (lng > mostEast) {
-                                    mostEast = lng;
-                                }
-                                else if (lat < mostWest) {
-                                    mostWest = lng;
-                                }
-                            }
-                            var bounds = new LocationRect(new Location(mostNorth + 0.015, mostWest + 0.0075), new Location(mostSouth - 0.002, mostEast - 0.0075));
-
-                            // Set start and end locations
-                            var startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
-                            var endLocation = new Location(double.Parse(results[results.Count - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[results.Count - 1].Longitude, CultureInfo.InvariantCulture));
-
-                            // Create MapLayer of driven route
-                            var polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
-                            for (var i = 1; i < results.Count; i++) {
-                                var polyLine = new MapPolyline();
-                                var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
-                                polyLine.Stroke = colourBrush;
-                                polyLine.StrokeThickness = 2;
-                                polyLine.Opacity = 1.0;
-
-                                polyLine.Locations = new LocationCollection {
-                                    new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
-                                    new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
-                                };
-                                polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
-                            }
-
-                            // Format date
-                            date = date.Replace('-', '/');
-                            date = date.Replace(" ", " - ");
-
-                            // Calculate distance
-                            var distance = 0.0;
-                            for (var i = 1; i < results.Count; i++) {
-                                var oldIndex = new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture));
-                                var newIndex = new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture));
-
-                                distance = distance + CalculateDistance(oldIndex, newIndex);
-                            }
-                            distance = distance / 1000; // Convert from meters to kilometers
-
-                            // Calculate duration
-                            // MAYBE Change to get difference between first and last index of 'results' collection
-                            string duration;
-                            var difference = dateEnd - dateStart;
-                            if (difference.TotalDays >= 1) {
-                                duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
-                            }
-                            else if (difference.TotalHours >= 1) {
-                                duration = difference.Hours + "h " + difference.Minutes + "m";
-                            }
-                            else {
-                                duration = difference.Minutes + "m";
-                            }
-
-                            // Create TripTile
-                            TripTileCollection.Add(new Tile(startLocation, endLocation, bounds, polyLineLayer, title, date, distance, duration));
-                        }
-                        catch (Exception) {
-                            //ignore
-                        }
-                    }
+                    GenerateTiles(dt);
                 }
             }
             catch (MySqlException exception) {
                 MessageBox.Show(exception.ToString());
+            }
+        }
+
+        private void LoadTripTiles(string search) {
+            var connection = new MySqlConnection(ConnectionString);
+            var dt = new DataTable();
+            connection.Open();
+
+            try {
+                var command = connection.CreateCommand();
+
+                if (search == String.Empty) {
+                    command.CommandText = "SELECT * FROM trips";
+                }
+                else {
+                    command.CommandText = $"SELECT * FROM trips WHERE CONCAT_WS('', time_started, time_ended, driver_username, driver_reg) LIKE '%{search}%'";
+                }
+
+                // TODO Make this into a separate method
+                using (var dr = command.ExecuteReader()) {
+                    dt.Load(dr);
+                    GenerateTiles(dt);
+                }
+            }
+            catch (MySqlException exception) {
+                MessageBox.Show(exception.ToString());
+            }
+        }
+
+        private void GenerateTiles(DataTable dt) {
+            TripTileCollection.Clear();
+            foreach (DataRow row in dt.Rows) {
+                try {
+                    // TODO Convert row data to RootObject for Tile creation
+                    var rowId = int.Parse(row["id"].ToString());
+                    var logs = row["log_file"].ToString();
+                    var title = row["driver_reg"].ToString();
+                    var date = row["time_started"].ToString();
+                    var dateStart = DateTime.Parse(row["time_started"].ToString());
+                    var dateEnd = DateTime.Parse(row["time_ended"].ToString());
+
+                    // TODO Fetch coordinates of first and last 'result'
+                    var results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
+
+                    // Set Bounds to fit all pins
+                    var mostNorth = double.Parse(results[0].Latitude, CultureInfo.InvariantCulture);
+                    var mostSouth = double.Parse(results[0].Latitude, CultureInfo.InvariantCulture);
+                    var mostEast = double.Parse(results[0].Longitude, CultureInfo.InvariantCulture);
+                    var mostWest = double.Parse(results[0].Longitude, CultureInfo.InvariantCulture);
+
+                    for (var i = 1; i < results.Count; i++) {
+                        var lat = double.Parse(results[i].Latitude, CultureInfo.InvariantCulture);
+                        var lng = double.Parse(results[i].Longitude, CultureInfo.InvariantCulture);
+
+                        if (lat > mostNorth) {
+                            mostNorth = lat;
+                        }
+                        else if (lat < mostSouth) {
+                            mostSouth = lat;
+                        }
+                        if (lng > mostEast) {
+                            mostEast = lng;
+                        }
+                        else if (lat < mostWest) {
+                            mostWest = lng;
+                        }
+                    }
+                    var bounds = new LocationRect(new Location(mostNorth + 0.015, mostWest + 0.0075), new Location(mostSouth - 0.002, mostEast - 0.0075));
+
+                    // Set start and end locations
+                    var startLocation = new Location(double.Parse(results[0].Latitude, CultureInfo.InvariantCulture), double.Parse(results[0].Longitude, CultureInfo.InvariantCulture));
+                    var endLocation = new Location(double.Parse(results[results.Count - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[results.Count - 1].Longitude, CultureInfo.InvariantCulture));
+
+                    // Create MapLayer of driven route
+                    var polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
+                    for (var i = 1; i < results.Count; i++) {
+                        var polyLine = new MapPolyline();
+                        var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
+                        polyLine.Stroke = colourBrush;
+                        polyLine.StrokeThickness = 2;
+                        polyLine.Opacity = 1.0;
+
+                        polyLine.Locations = new LocationCollection {
+                            new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture)),
+                            new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture))
+                        };
+                        polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
+                    }
+
+                    // Format date
+                    date = date.Replace('-', '/');
+                    date = date.Replace(" ", " - ");
+
+                    // Calculate distance
+                    var distance = 0.0;
+                    for (var i = 1; i < results.Count; i++) {
+                        var oldIndex = new Location(double.Parse(results[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i - 1].Longitude, CultureInfo.InvariantCulture));
+                        var newIndex = new Location(double.Parse(results[i].Latitude, CultureInfo.InvariantCulture), double.Parse(results[i].Longitude, CultureInfo.InvariantCulture));
+
+                        distance = distance + CalculateDistance(oldIndex, newIndex);
+                    }
+                    distance = distance / 1000; // Convert from meters to kilometers
+
+                    // Calculate duration
+                    // MAYBE Change to get difference between first and last index of 'results' collection
+                    string duration;
+                    var difference = dateEnd - dateStart;
+                    if (difference.TotalDays >= 1) {
+                        duration = difference.Days + "d " + difference.Hours + "h " + difference.Minutes + "m";
+                    }
+                    else if (difference.TotalHours >= 1) {
+                        duration = difference.Hours + "h " + difference.Minutes + "m";
+                    }
+                    else {
+                        duration = difference.Minutes + "m";
+                    }
+
+                    // Create TripTile
+                    TripTileCollection.Add(new Tile(rowId, startLocation, endLocation, bounds, polyLineLayer, title, date, distance, duration));
+                }
+                catch (Exception) {
+                    //ignore
+                }
             }
         }
 
@@ -173,27 +210,6 @@ namespace Raven {
 
             [JsonProperty(PropertyName = "Lng")]
             public string Longitude { get; set; }
-        }
-
-        public void SqlGetByReg(string reg) {
-            var connection = new MySqlConnection(ConnectionString);
-            var dt = new DataTable();
-            connection.Open();
-
-            try {
-                var command = connection.CreateCommand();
-                command.CommandText = $"SELECT * FROM trips WHERE driver_reg='{reg}'";
-
-                using (var dr = command.ExecuteReader()) {
-                    dt.Load(dr);
-                    foreach (var line in dt.Rows[0].ItemArray) {
-                        MessageBox.Show(line.ToString());
-                    }
-                }
-            }
-            catch (MySqlException exception) {
-                MessageBox.Show(exception.ToString());
-            }
         }
 
         // Returns the distance (in metric meters) between two locations
@@ -239,25 +255,34 @@ namespace Raven {
         }
 
         private void SearchBtn_OnClick(object sender, RoutedEventArgs e) {
-            if (Regex.IsMatch(SearchDetailsBox.Text, "[A-z]{2}[0-9]{5}")) {
-                SqlGetByReg(SearchDetailsBox.Text);
+            if (SearchDetailsBox.Text != string.Empty) {
+                LoadTripTiles(SearchDetailsBox.Text);
             }
-            else if (SearchDetailsBox.Text == string.Empty) {
-                TripTileCollection.Clear();
+            else {
                 LoadTripTiles();
             }
         }
 
-        private void TripItemsControl_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            TileGrid.Visibility = Visibility.Collapsed;
+        private void TripItemsControl_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+            // Visibility control
+            TripTileGrid.Visibility = Visibility.Collapsed;
+            RouteViewerGrid.Visibility = Visibility.Visible;
             RavenMainWindow.WindowState = WindowState.Maximized;
+
+            // Load info
+
+            // Setup Map
         }
 
         private void RavenMainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
-
-            TileGrid.Visibility = Visibility.Visible;
+            // Visibility control
+            TripTileGrid.Visibility = Visibility.Visible;
+            RouteViewerGrid.Visibility = Visibility.Collapsed;
             RavenMainWindow.WindowState = WindowState.Normal;
+
+            // Clear info
+
+            // Cleanup Map
         }
     }
 }
