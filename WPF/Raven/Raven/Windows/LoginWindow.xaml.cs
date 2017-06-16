@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
 using MySql.Data.MySqlClient;
 
 namespace Raven.Windows {
@@ -23,20 +22,8 @@ namespace Raven.Windows {
         [DllImport("user32.dll")]
         public static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
-        private const int GwlStyle = -16;
-
-        private const uint WsSysmenu = 0x80000;
-
-        protected override void OnSourceInitialized(EventArgs e) {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            SetWindowLong(hwnd, GwlStyle,
-                GetWindowLong(hwnd, GwlStyle) & (0xFFFFFFFF ^ WsSysmenu));
-
-            base.OnSourceInitialized(e);
-        }
-
         public LoginWindow() {
-            InitializeComponent(); // TODO Figure out how to get the close button back
+            InitializeComponent();
         }
 
         private void LoginBtn_Click(object sender, RoutedEventArgs e) {

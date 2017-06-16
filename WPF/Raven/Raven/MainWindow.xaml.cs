@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Device.Location;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 using System.Windows.Media;
 using MySql.Data.MySqlClient;
@@ -61,7 +60,6 @@ namespace Raven {
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT * FROM trips";
 
-                // TODO Make this into a separate method
                 using (var dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     GenerateTiles(dt);
@@ -87,7 +85,6 @@ namespace Raven {
                     command.CommandText = $"SELECT * FROM trips WHERE CONCAT_WS('', time_started, time_ended, driver_username, driver_reg) LIKE '%{search}%'";
                 }
 
-                // TODO Make this into a separate method
                 using (var dr = command.ExecuteReader()) {
                     dt.Load(dr);
                     GenerateTiles(dt);
@@ -102,7 +99,6 @@ namespace Raven {
             TripTileCollection.Clear();
             foreach (DataRow row in dt.Rows) {
                 try {
-                    // TODO Convert row data to RootObject for Tile creation
                     var rowId = int.Parse(row["id"].ToString());
                     var logs = row["log_file"].ToString();
                     var title = row["driver_reg"].ToString();
@@ -110,7 +106,6 @@ namespace Raven {
                     var dateStart = DateTime.Parse(row["time_started"].ToString());
                     var dateEnd = DateTime.Parse(row["time_ended"].ToString());
 
-                    // TODO Fetch coordinates of first and last 'result'
                     var results = JsonConvert.DeserializeObject<List<RootObject>>(logs);
 
                     // Set Bounds to fit all pins
