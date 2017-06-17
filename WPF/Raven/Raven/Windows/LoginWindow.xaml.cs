@@ -53,7 +53,7 @@ namespace Raven.Windows {
 
             try {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT * FROM logins";
+                command.CommandText = "SELECT * FROM logins";
 
                 using (var dr = command.ExecuteReader()) {
                     dt.Load(dr);

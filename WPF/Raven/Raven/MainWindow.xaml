@@ -6,8 +6,7 @@
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
         xmlns:controls="clr-namespace:Raven.Controls" MouseRightButtonUp="RavenMainWindow_OnMouseRightButtonUp"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}" x:Name="RavenMainWindow"
-        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT"
-        >
+        Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
     <Window.Resources>
         <!-- TextBox Filters -->
@@ -87,101 +86,105 @@
     </Window.Resources>
 
     <Grid x:Name="MainGrid">
-        <Grid x:Name="TripTileGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-        <!-- VIN / REG / Driver Filter -->
-        <TextBox x:Name="SearchDetailsBox" Grid.Row="0" Grid.Column="0" Width="300" Style="{StaticResource SearchDetailsStyle}" HorizontalAlignment="Left" Margin="10" FontSize="18" />
-
-        <!-- Date Start - Date End Filters -->
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
-            <Button x:Name="TileBtn" Content="Create Tile" Width="100" Height="24" />
-            <TextBox x:Name="SearchDateStartBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" Style="{StaticResource SearchDateStartStyle}"/>
-            <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center" Margin="0,0,0,2" />
-            <TextBox x:Name="SearchDateEndBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18" Style="{StaticResource SearchDateEndStyle}" />
-        </StackPanel>
-
-        <!-- TripTile Section -->
-        <ScrollViewer x:Name="TileScrollView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <ItemsControl x:Name="TripItemsControl" ItemsSource="{Binding TripTileCollection}" ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10" HorizontalAlignment="Center" MouseLeftButtonUp="TripItemsControl_OnMouseLeftButtonUp">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border CornerRadius="9" BorderBrush="Gray" BorderThickness="3" Margin="10" Width="276"
-                                    Height="176" Cursor="Hand">
-                            <!--<Border.Effect>
-                                <DropShadowEffect Opacity="0.5"/>
-                            </Border.Effect>-->
-                            <Border CornerRadius="9">
-                                <Border.Clip>
-                                    <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,271,171" />
-                                </Border.Clip>
-                                <Grid x:Name="TileGrid" Width="270" Height="170" Background="White" HorizontalAlignment="Stretch">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <!--VIN or REG and distance-->
-                                    <TextBlock Grid.Row="0" Grid.Column="0"  Text="{Binding Path=Title}"
-                                                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                                   Margin="8,3,0,0">
-                                    </TextBlock>
-                                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Margin="0,3,8,0">
-                                            <Run Text="{Binding Path=Distance, StringFormat=f2}"/>
-                                            <Run Text="km" />
-                                    </TextBlock>
-
-                                    <!--Date, time and duration-->
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=Date}" Margin="8,0,0,0"
-                                                   HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                    <TextBlock Grid.Row="1" Text="{Binding Path=Duration}" Grid.Column="1" Margin="0,0,8,0"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Top"/>
-
-                                    <!-- Map -->
-                                    <controls:TileMap x:Name="TileMap" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2,0,0"/>
-                                </Grid>
-                            </Border>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-
-        </Grid>
-        
-        <Grid x:Name="RouteViewerGrid" Visibility="Hidden">
+        <Grid x:Name="TripTileGrid" Visibility="Visible">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- VIN / REG / Driver Filter -->
+            <TextBox x:Name="SearchDetailsBox" Grid.Row="0" Grid.Column="0" Width="300"
+                     Style="{StaticResource SearchDetailsStyle}" HorizontalAlignment="Left" Margin="10" FontSize="18" />
+
+            <!-- Date Start - Date End Filters -->
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
+                <Button x:Name="TileBtn" Content="Create Tile" Width="100" Height="24" />
+                <TextBox x:Name="SearchDateStartBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"
+                         Style="{StaticResource SearchDateStartStyle}" />
+                <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center"
+                           Margin="0,0,0,2" />
+                <TextBox x:Name="SearchDateEndBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"
+                         Style="{StaticResource SearchDateEndStyle}" />
+            </StackPanel>
+
+            <!-- TripTile Section -->
+            <ScrollViewer x:Name="TileScrollView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                <ItemsControl x:Name="TripItemsControl" ItemsSource="{Binding TripTileCollection}"
+                              ItemContainerStyle="{StaticResource TripTileContainerStyle}" Margin="10"
+                              HorizontalAlignment="Center" MouseLeftButtonUp="TripItemsControl_OnMouseLeftButtonUp">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="9" BorderBrush="Gray" BorderThickness="3" Margin="10" Width="276"
+                                    Height="176" Cursor="Hand">
+                                <Border CornerRadius="9">
+                                    <Border.Clip>
+                                        <RectangleGeometry RadiusX="9" RadiusY="9" Rect="0,0,271,171" />
+                                    </Border.Clip>
+                                    <Grid x:Name="TileGrid" Width="270" Height="170" Background="White"
+                                          HorizontalAlignment="Stretch">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--VIN or REG and distance-->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Path=Title}"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                   Margin="8,3,0,0" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom" Margin="0,3,8,0">
+                                            <Run Text="{Binding Path=Distance, StringFormat=f2}" />
+                                            <Run Text="km" />
+                                        </TextBlock>
+
+                                        <!--Date, time and duration-->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=Date}"
+                                                   Margin="8,0,0,0"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                        <TextBlock Grid.Row="1" Text="{Binding Path=Duration}" Grid.Column="1"
+                                                   Margin="0,0,8,0"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+                                        <!-- Map -->
+                                        <controls:TileMap x:Name="TileMap" Grid.Row="2" Grid.Column="0"
+                                                          Grid.ColumnSpan="2" Margin="0,2,0,0" />
+                                    </Grid>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+        </Grid>
+
+        <Grid x:Name="RouteViewerGrid" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
             <m:Map x:Name="RouteViewerMap" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                <m:Pushpin x:Name="StartLocationPin" Location="55.73193, 12.34341" Background="Green" Cursor="Hand"/>
-                <m:Pushpin x:Name="EndLocationPin" Location="55.758011, 12.39254" Background="Red" Cursor="Hand"/>
-                
                 <m:Map.CredentialsProvider>
-                    <m:ApplicationIdCredentialsProvider ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm"/>
+                    <m:ApplicationIdCredentialsProvider
+                        ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm" />
                 </m:Map.CredentialsProvider>
             </m:Map>
         </Grid>
