@@ -96,20 +96,22 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- VIN / REG / Driver Filter -->
-            <TextBox x:Name="SearchDetailsBox" Grid.Row="0" Grid.Column="0" Width="300"
-                     Style="{StaticResource SearchDetailsStyle}" HorizontalAlignment="Left" Margin="10" FontSize="18" />
+            
 
             <!-- Date Start - Date End Filters -->
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
-                <Button x:Name="TileBtn" Content="Create Tile" Width="100" Height="24" />
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <!-- VIN / REG / Driver Filter -->
+                <TextBox x:Name="SearchDetailsBox" Width="300"
+                         Style="{StaticResource SearchDetailsStyle}" HorizontalAlignment="Left" Margin="10" FontSize="18" />
+                <TextBlock Text="or" HorizontalAlignment="Right" FontSize="14" VerticalAlignment="Center"
+                           Margin="0,0,0,0" />
                 <TextBox x:Name="SearchDateStartBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"
                          Style="{StaticResource SearchDateStartStyle}" />
                 <TextBlock Text="-" HorizontalAlignment="Right" FontSize="18" VerticalAlignment="Center"
-                           Margin="0,0,0,2" />
+                           Margin="0,0,0,0" />
                 <TextBox x:Name="SearchDateEndBox" Width="150" HorizontalAlignment="Right" Margin="10" FontSize="18"
                          Style="{StaticResource SearchDateEndStyle}" />
+                <Button x:Name="SearchBtn" Click="SearchBtn_OnClick" Content="Search" Width="100" Height="24" />
             </StackPanel>
 
             <!-- TripTile Section -->

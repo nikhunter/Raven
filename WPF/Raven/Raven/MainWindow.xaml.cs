@@ -320,7 +320,7 @@ namespace Raven {
             }
 
             // Create new bounds
-            var bounds = new LocationRect(new Location(item.Bounds.Center.Latitude - 0.0065, item.Bounds.Center.Longitude), item.Bounds.Width, item.Bounds.Height);
+            var bounds = new LocationRect(new Location(item.Bounds.Center.Latitude - 0.0065, item.Bounds.Center.Longitude), item.Bounds.Width + 0.05, item.Bounds.Height + 0.05);
             
             // Clear TripTileCollection for smoother RouteViewerMap
             TripTileCollection.Clear();
