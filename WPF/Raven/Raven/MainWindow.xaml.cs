@@ -216,23 +216,6 @@ namespace Raven {
             return null;
         }
 
-        public class RootObject {
-            [JsonProperty(PropertyName = "DeltaTime")]
-            public string DeltaTime { get; set; }
-
-            [JsonProperty(PropertyName = "Rpm")]
-            public string Rpm { get; set; }
-
-            [JsonProperty(PropertyName = "Speed")]
-            public string Speed { get; set; }
-
-            [JsonProperty(PropertyName = "Lat")]
-            public string Latitude { get; set; }
-
-            [JsonProperty(PropertyName = "Lng")]
-            public string Longitude { get; set; }
-        }
-
         // Returns the distance (in metric meters) between two locations
         public static double CalculateDistance(Location previousPin, Location currentPin) {
             try {
@@ -244,35 +227,6 @@ namespace Raven {
             catch (Exception) {
                 return 0;
             }
-        }
-
-        // Returns the Location in the middle of two GeoCoordinates
-        public Location MidPoint(Location posA, Location posB) {
-            var midPoint = new GeoCoordinate();
-
-            var dLon = DegreeToRadian(posB.Longitude - posA.Longitude);
-            var bx = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Cos(dLon);
-            var by = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Sin(dLon);
-
-            midPoint.Latitude = RadianToDegree(Math.Atan2(
-                Math.Sin(DegreeToRadian(posA.Latitude)) + Math.Sin(DegreeToRadian(posB.Latitude)),
-                Math.Sqrt(
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) *
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) + by * by)));
-
-            midPoint.Longitude = posA.Longitude +
-                                 RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
-
-            // MAYBE Add an offset to Latitude
-            return new Location(midPoint.Latitude, midPoint.Longitude);
-        }
-
-        public double DegreeToRadian(double angle) {
-            return Math.PI * angle / 180.0;
-        }
-
-        public double RadianToDegree(double angle) {
-            return angle * (180.0 / Math.PI);
         }
 
         private void SearchBtn_OnClick(object sender, RoutedEventArgs e) {
@@ -321,7 +275,7 @@ namespace Raven {
 
             // Create new bounds
             var bounds = new LocationRect(new Location(item.Bounds.Center.Latitude - 0.0065, item.Bounds.Center.Longitude), item.Bounds.Width + 0.05, item.Bounds.Height + 0.05);
-            
+
             // Clear TripTileCollection for smoother RouteViewerMap
             TripTileCollection.Clear();
 
@@ -344,6 +298,23 @@ namespace Raven {
 
             // Reload TripTiles from previous search
             LoadTripTiles(LastSearch);
+        }
+
+        public class RootObject {
+            [JsonProperty(PropertyName = "DeltaTime")]
+            public string DeltaTime { get; set; }
+
+            [JsonProperty(PropertyName = "Rpm")]
+            public string Rpm { get; set; }
+
+            [JsonProperty(PropertyName = "Speed")]
+            public string Speed { get; set; }
+
+            [JsonProperty(PropertyName = "Lat")]
+            public string Latitude { get; set; }
+
+            [JsonProperty(PropertyName = "Lng")]
+            public string Longitude { get; set; }
         }
     }
 }

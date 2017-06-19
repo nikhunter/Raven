@@ -16,12 +16,6 @@ namespace Raven.Windows {
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
         public bool LoginSuccess;
 
-        [DllImport("user32.dll")]
-        public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll")]
-        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-
         public LoginWindow() {
             InitializeComponent();
         }
@@ -43,6 +37,7 @@ namespace Raven.Windows {
             }
         }
 
+        // Returns true or false depending on a SQL check for a login that matches username and password
         public bool AuthenticateLogin(string username, string password) {
             // Stores hash value of password in hash
             var hash = GetHash(password);
@@ -70,7 +65,8 @@ namespace Raven.Windows {
             }
             return false;
         }
-
+        
+        // Returns plain password converted to SHA512 encrypted as string
         public static string GetHash(string inputString) {
             var sha512 = SHA512.Create();
             var bytes = Encoding.UTF8.GetBytes(inputString);
@@ -78,6 +74,7 @@ namespace Raven.Windows {
             return GetStringFromHash(hash);
         }
 
+        // Returns a hash string built from a byte array
         private static string GetStringFromHash(byte[] hash) {
             var result = new StringBuilder();
             foreach (var t in hash) {
@@ -86,24 +83,28 @@ namespace Raven.Windows {
             return result.ToString();
         }
 
-        private void UsernameText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+        // Empties UsernameText if there are no characters when losing focus
+        private void UsernameText_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (string.IsNullOrEmpty(UsernameText.Text)) {
                 UsernameText.Text = null;
             }
         }
-
+        
+        // Empties PasswordText if it contains dummy characters when getting focus
         private void PasswordText_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (PasswordText.Password == "PPPPPPPP") {
                 PasswordText.Password = null;
             }
         }
 
+        // Fills PasswordText with dummy characters when losing focus
         private void PasswordText_LostGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (PasswordText.Password == "") {
                 PasswordText.Password = "PPPPPPPP";
             }
         }
 
+        // Key event that registers Enter or RShift + Enter
         private void LoginWindow_OnKeyDown(object sender, KeyEventArgs e) {
             switch (e.Key) {
                 case Key.Enter:

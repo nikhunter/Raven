@@ -37,7 +37,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Image Source="../Resources/256.png" Margin="10"/>
-        <TextBox x:Name="UsernameText" Grid.Row="1" Height="22" Margin="10,5" LostKeyboardFocus="UsernameText_OnLostKeyboardFocus"/>
+        <TextBox x:Name="UsernameText" Grid.Row="1" Height="22" Margin="10,5" LostKeyboardFocus="UsernameText_LostKeyboardFocus"/>
         <PasswordBox x:Name="PasswordText" Grid.Row="2" Height="22" Margin="10,5" Password="PPPPPPPP" GotKeyboardFocus="PasswordText_OnGotKeyboardFocus" LostKeyboardFocus="PasswordText_LostGotKeyboardFocus"/>
         <Button x:Name="LoginBtn" Content="Login" Grid.Row="3" Margin="10" Height="32" Click="LoginBtn_Click" BorderThickness="1" />
     </Grid>
