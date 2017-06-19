@@ -23,6 +23,7 @@ namespace Raven {
 
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
         public static string Username = "";
+        public static string LastSearch = "";
 
         public MainWindow() {
             // Initiate LoginWindow element
@@ -39,6 +40,7 @@ namespace Raven {
                     }
                     else {
                         LoadTripTiles(Username);
+                        LastSearch = Username;
                     }
                     Show();
                 }
@@ -95,7 +97,7 @@ namespace Raven {
             }
         }
 
-        private void GenerateTiles(DataTable dt) {
+        public void GenerateTiles(DataTable dt) {
             TripTileCollection.Clear();
             foreach (DataRow row in dt.Rows) {
                 try {
@@ -190,21 +192,28 @@ namespace Raven {
             }
         }
 
-        public class RootObject {
-            [JsonProperty(PropertyName = "DeltaTime")]
-            public string DeltaTime { get; set; }
+        private List<RootObject> RouteViewerLoadTrip(int tripId) {
+            var connection = new MySqlConnection(ConnectionString);
+            var dt = new DataTable();
+            connection.Open();
 
-            [JsonProperty(PropertyName = "Rpm")]
-            public string Rpm { get; set; }
+            try {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT * FROM trips WHERE id={tripId}";
 
-            [JsonProperty(PropertyName = "Speed")]
-            public string Speed { get; set; }
+                using (var dr = command.ExecuteReader()) {
+                    dt.Load(dr);
+                    foreach (DataRow row in dt.Rows) {
+                        var logs = row["log_file"].ToString();
+                        return JsonConvert.DeserializeObject<List<RootObject>>(logs);
+                    }
+                }
+            }
+            catch (MySqlException exception) {
+                MessageBox.Show(exception.ToString());
+            }
 
-            [JsonProperty(PropertyName = "Lat")]
-            public string Latitude { get; set; }
-
-            [JsonProperty(PropertyName = "Lng")]
-            public string Longitude { get; set; }
+            return null;
         }
 
         // Returns the distance (in metric meters) between two locations
@@ -220,35 +229,6 @@ namespace Raven {
             }
         }
 
-        // Returns the Location in the middle of two GeoCoordinates
-        public Location MidPoint(Location posA, Location posB) {
-            var midPoint = new GeoCoordinate();
-
-            var dLon = DegreeToRadian(posB.Longitude - posA.Longitude);
-            var bx = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Cos(dLon);
-            var by = Math.Cos(DegreeToRadian(posB.Latitude)) * Math.Sin(dLon);
-
-            midPoint.Latitude = RadianToDegree(Math.Atan2(
-                Math.Sin(DegreeToRadian(posA.Latitude)) + Math.Sin(DegreeToRadian(posB.Latitude)),
-                Math.Sqrt(
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) *
-                    (Math.Cos(DegreeToRadian(posA.Latitude)) + bx) + by * by)));
-
-            midPoint.Longitude = posA.Longitude +
-                                 RadianToDegree(Math.Atan2(by, Math.Cos(DegreeToRadian(posA.Latitude)) + bx));
-
-            // MAYBE Add an offset to Latitude
-            return new Location(midPoint.Latitude, midPoint.Longitude);
-        }
-
-        public double DegreeToRadian(double angle) {
-            return Math.PI * angle / 180.0;
-        }
-
-        public double RadianToDegree(double angle) {
-            return angle * (180.0 / Math.PI);
-        }
-
         private void SearchBtn_OnClick(object sender, RoutedEventArgs e) {
             if (SearchDetailsBox.Text != string.Empty) {
                 LoadTripTiles(SearchDetailsBox.Text);
@@ -256,8 +236,12 @@ namespace Raven {
             else {
                 LoadTripTiles();
             }
+
+            LastSearch = SearchDetailsBox.Text;
         }
 
+        // TODO Generate pins with custom orange ellipse style
+        // TODO Click event for pins that display all details of that pin on the right hand side
         private void TripItemsControl_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
             // Visibility control
             TripTileGrid.Visibility = Visibility.Collapsed;
@@ -265,8 +249,42 @@ namespace Raven {
             RavenMainWindow.WindowState = WindowState.Maximized;
 
             // Load info
+            var clickedItem = (FrameworkElement) e.OriginalSource;
+            var item = (Tile) clickedItem.DataContext;
+            var locations = RouteViewerLoadTrip(item.RowId);
+
+            // Create Start/Stop pins
+            var startLocation = new Pushpin {Background = Brushes.Green, Location = item.StartLocation, Cursor = Cursors.Hand};
+            var endLocation = new Pushpin {Background = Brushes.Red, Location = item.EndLocation, Cursor = Cursors.Hand};
+
+            // Create MapLayer of 'locations'
+            var polyLineLayer = new MapLayer(); // Layer used only for MapPolyLines for easier cleaning
+            for (var i = 1; i < locations.Count; i++) {
+                var polyLine = new MapPolyline();
+                var colourBrush = new SolidColorBrush {Color = Color.FromRgb(232, 123, 45)};
+                polyLine.Stroke = colourBrush;
+                polyLine.StrokeThickness = 3;
+                polyLine.Opacity = 1.0;
+
+                polyLine.Locations = new LocationCollection {
+                    new Location(double.Parse(locations[i - 1].Latitude, CultureInfo.InvariantCulture), double.Parse(locations[i - 1].Longitude, CultureInfo.InvariantCulture)),
+                    new Location(double.Parse(locations[i].Latitude, CultureInfo.InvariantCulture), double.Parse(locations[i].Longitude, CultureInfo.InvariantCulture))
+                };
+                polyLineLayer.Children.Add(polyLine); // Adds a new line to the layer
+            }
+
+            // Create new bounds
+            var bounds = new LocationRect(new Location(item.Bounds.Center.Latitude - 0.0065, item.Bounds.Center.Longitude), item.Bounds.Width + 0.05, item.Bounds.Height + 0.05);
+
+            // Clear TripTileCollection for smoother RouteViewerMap
+            TripTileCollection.Clear();
 
             // Setup Map
+            RouteViewerMap.SetView(bounds);
+            RouteViewerMap.Children.Add(polyLineLayer);
+
+            RouteViewerMap.Children.Add(startLocation);
+            RouteViewerMap.Children.Add(endLocation);
         }
 
         private void RavenMainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
@@ -275,9 +293,28 @@ namespace Raven {
             RouteViewerGrid.Visibility = Visibility.Collapsed;
             RavenMainWindow.WindowState = WindowState.Normal;
 
-            // Clear info
-
             // Cleanup Map
+            RouteViewerMap.Children.Clear();
+
+            // Reload TripTiles from previous search
+            LoadTripTiles(LastSearch);
+        }
+
+        public class RootObject {
+            [JsonProperty(PropertyName = "DeltaTime")]
+            public string DeltaTime { get; set; }
+
+            [JsonProperty(PropertyName = "Rpm")]
+            public string Rpm { get; set; }
+
+            [JsonProperty(PropertyName = "Speed")]
+            public string Speed { get; set; }
+
+            [JsonProperty(PropertyName = "Lat")]
+            public string Latitude { get; set; }
+
+            [JsonProperty(PropertyName = "Lng")]
+            public string Longitude { get; set; }
         }
     }
 }
