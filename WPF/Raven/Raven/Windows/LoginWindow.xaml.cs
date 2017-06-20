@@ -1,7 +1,5 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
@@ -84,7 +82,7 @@ namespace Raven.Windows {
         }
 
         // Empties UsernameText if there are no characters when losing focus
-        private void UsernameText_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+        private void UsernameText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (string.IsNullOrEmpty(UsernameText.Text)) {
                 UsernameText.Text = null;
             }
@@ -98,7 +96,7 @@ namespace Raven.Windows {
         }
 
         // Fills PasswordText with dummy characters when losing focus
-        private void PasswordText_LostGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+        private void PasswordText_OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             if (PasswordText.Password == "") {
                 PasswordText.Password = "PPPPPPPP";
             }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
-using System.Windows.Controls;
 using System.Device.Location;
 using System.Globalization;
 using System.Windows.Input;
