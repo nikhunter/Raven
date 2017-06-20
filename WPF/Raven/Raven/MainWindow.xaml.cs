@@ -48,9 +48,6 @@ namespace Raven {
                     Close();
                 }
             };
-
-            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
-                new FrameworkPropertyMetadata(int.MaxValue)); // Sets ToolTip duration to the max value of a long
         }
 
         private void LoadTripTiles() {
