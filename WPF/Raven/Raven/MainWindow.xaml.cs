@@ -19,7 +19,7 @@ namespace Raven {
     /// </summary>
     public partial class MainWindow {
         public static ObservableCollection<Tile> TripTileCollection { get; set; } =
-            new ObservableCollection<Tile>(); // Collection of Map  pins, uses custom Datapoint class as type
+            new ObservableCollection<Tile>(); // Collection of TripTiles, using custom Tile type
 
         private const string ConnectionString = "Server=raven-gps.com;Database=raven;Uid=root;Pwd=Raven123";
         public static string Username = "";
@@ -35,6 +35,7 @@ namespace Raven {
             loginWindow.Closed += delegate {
                 if (loginWindow.LoginSuccess) {
                     Title = $"Raven - Logged in as {Username}";
+                    Show();
                     if (Username == "DebugUser") {
                         LoadTripTiles();
                     }
@@ -42,7 +43,6 @@ namespace Raven {
                         LoadTripTiles(Username);
                         LastSearch = Username;
                     }
-                    Show();
                 }
                 else {
                     Close();
