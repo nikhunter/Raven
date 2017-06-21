@@ -283,7 +283,7 @@ namespace Raven {
             RouteViewerMap.Children.Add(endLocation);
         }
 
-        private void RavenMainWindow_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
+        private void RouteViewerMap_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
             // Visibility control
             TripTileGrid.Visibility = Visibility.Visible;
             RouteViewerGrid.Visibility = Visibility.Collapsed;

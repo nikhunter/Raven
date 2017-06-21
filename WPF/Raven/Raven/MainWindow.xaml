@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-        xmlns:controls="clr-namespace:Raven.Controls" MouseRightButtonUp="RavenMainWindow_OnMouseRightButtonUp"
+        xmlns:controls="clr-namespace:Raven.Controls"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}" x:Name="RavenMainWindow"
         Title="Raven" Width="1280" Height="700" WindowStartupLocation="CenterScreen" FontFamily="Futura Bk BT">
 
@@ -183,7 +183,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
-            <m:Map x:Name="RouteViewerMap" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <m:Map x:Name="RouteViewerMap" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" MapForegroundStyle="{StaticResource BigMapForegroundStyle}" MouseRightButtonUp="RouteViewerMap_OnMouseRightButtonUp">
                 <m:Map.CredentialsProvider>
                     <m:ApplicationIdCredentialsProvider
                         ApplicationId="AiH5jFzeiEdPEQoYOOaK9pi9bew_xTAUMWEGh9l8X1l0FJ40aXB2zDyu6p3jPwbm" />
